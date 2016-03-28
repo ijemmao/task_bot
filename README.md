@@ -39,3 +39,19 @@ full text search of documents
 the stack for this is: Express, Mongo, React, Bootstrap
 sample app includes:
 user login
+
+
+## Additional Tools:
+- Git Autocomplete: Being able to git checkout <TAB> for branches
+https://github.com/bobthecow/git-flow-completion/wiki/Install-Bash-git-completion
+
+## Useful Atom Packages:
+- autocomplete-plus: autocompletes while typing
+- highlight-line: highlights the current line you're on
+- emmet: scaffolding HTML and CSS
+- conflicts: helps fix merge conflicts
+- atom-lint: easy integration with linters, such as flake8 or jslint
+- color-picker: right click on a color
+- pigments: displays colors in projects and files
+- minimap: code map for quick scroll
+- highlight-selected: When you select a keyword or variable all other instances are shown. 
