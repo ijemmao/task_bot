@@ -18,14 +18,14 @@ GitHub (https://github.com/dali-lab) get an account on this.
 
 ## Developer Environments and Editors:
 - Atom  (http://atom.io)  I personally like this better as a text/code editor than Sublime (http://www.sublimetext.com/) but both are really nice
-- IntelliJ  (http://www.jetbrains.com/idea/download/)  Best developer environment out there, supports Java/Javascript/Node/Ruby/Rails/Python/Less/SASS.  We have a free license -- email tim@dali for an invite.
-- Fenix  (http://fenixwebserver.com)  Simple little webserver app to run multiple local static file/js testing http servers.
-- MAMP  (http://www.mamp.info/en/)  Mysql/Apache/PHP for OSX for say running Wordpress.  (We’re trying to move away from Wordpress in general but sometimes its the best solution.)
+- IntelliJ  (http://www.jetbrains.com/idea/download/)  Best developer environment out there, supports Java/Javascript/Node/Ruby/Rails/Python/Less/SASS.  We have a free license: https://account.jetbrains.com/a/39n0fyi9
+- MAMP  (http://www.mamp.info/en/)  Mysql/Apache/PHP for OSX for say running Wordpress.  (wordpress is the worst -- use ghostjs instead: http://ghost.org/download)
 
 ## Frameworks and Services:
-- Parse  (http://www.parse.com) backend as a service with SDK’s for javascript/node/iOS/etc.  Very convenient and fast for rapid prototyping. Just build the frontend and let Parse do the backend for you.  The javascript parse sdk is built on top of Backbone.js so you have a great frontend framework built-in. 
+- Parse  (http://www.parse.com) backend as a service with SDK’s for javascript/node/iOS/etc. Note: Parse has been opensourced and is in a period of transition. For old projects it is safe to continue using and can be migrated to self-hosting.  For new projects check out http://firebase.com instead.
 
 ## Starter Projects:
+*this section is currently out of date*
 
 - Parse/Backbone/Express starter project: https://github.com/dali-lab/ParseStarterApp 
 the stack for this is: Parse/Backbone, Express, Facebook, jQuery, Bootstrap
