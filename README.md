@@ -44,6 +44,7 @@ user login
 ## Additional Tools:
 - Git Autocomplete: Being able to git checkout <TAB> for branches
 https://github.com/bobthecow/git-flow-completion/wiki/Install-Bash-git-completion
+- Square's Vim and Tmux Config Files: https://github.com/square/maximum-awesome
 
 ## Useful Atom Packages:
 - autocomplete-plus: autocompletes while typing
