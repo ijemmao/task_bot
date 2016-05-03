@@ -8,7 +8,7 @@ TravisCI is a continuous integration system that allows you to easily test and d
 
 ###### Linters
 
-Linters are code parsers that check your code for syntax errors, common style mistakes, and makes sure that your code falls under best practices. Linters help save time, detect bugs, and improve code quality. Linters exist for all types of languages and even markdown such as HTML, CSS, and JSON. Linters are especially helpful for detecting syntax errors while using lightweight code editors such as Atom or Sublime Text that doesn't have that built in functionality of IDEs such as Intel or Pycharm.
+Linters are code parsers that check your code for syntax errors, common style mistakes, and makes sure that your code falls under best practices. Linters help save time, detect bugs, and improve code quality. Linters exist for all types of languages and even markdown such as HTML, CSS, and JSON. Linters are especially helpful for detecting syntax errors while using lightweight code editors such as Atom or Sublime Text that doesn't have that built in functionality of IDEs such as IntelliJ or Pycharm.
 
 #### Setup
 
