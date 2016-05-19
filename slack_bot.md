@@ -1,14 +1,15 @@
 # Make your own Slack Bot integration
 
-We'll be building a Slack bot that will send new users a welcome message. It will be a simple Node.js + Express.js app and run on [Heroku](https://www.heroku.com/). We'll be using the command line extensively!
+We'll be building a Slack bot that will send new users a welcome message. It will be a simple [Node.js](https://nodejs.org/en/) + [Express.js](http://expressjs.com/) app and run on [Heroku](https://www.heroku.com/). You can read the official documentation on Slack users [here](https://api.slack.com/bot-users).
 
 1. ### Setup
+We'll need to set up a few things to get started.
   1. #### Slack
-     1. we'll add a bot to our Slack team
-     1. start by going to your Slack desktop app (you should install this!) and to the Slack team you want to add the bot to
+     We begin by adding a bot to our Slack team.
+     1. to your Slack desktop app (you should install this!) and to your Slack team
      1. click on the team name in the top-left and then click "Apps & Integrations"
      1. search for "bot" and click the top result, "Bots"
-     1. click "Add Configuration" to set up the bot
+     1. click "Add Configuration" and fill in the details for the bot
      1. take note of the "API Token" at the end of the setup
   1. #### Github
     1. make a repo on [Github](http://github.com/)
@@ -26,8 +27,7 @@ We'll be building a Slack bot that will send new users a welcome message. It wil
       "version": "0.0.0",
       "description": "CentrifugalHooks Slack bot",
       "main": "web.js",
-      "scripts": {
-      },
+      "scripts": {},
       "repository": {
         "type": "git",
         "url": "git@heroku.com:centrifugal-hooks-bot.git "
@@ -40,4 +40,4 @@ We'll be building a Slack bot that will send new users a welcome message. It wil
     ```
     1. the guide will have you set install express, go ahead and do that!
       - tip: when you install via `npm`, use the `--save` flag to automatically add the module to your `package.json` dependencies
-    1.
+1. ### Listening for events
