@@ -7,19 +7,19 @@ Bot users are similar to human users in that they have names, profile pictures, 
 
 ### Setup
 Some of the technologies we'll be using are Slack, Github, Heroku, and Node.js. You're already familiar with Slack and Github, but Heroku and Node might be new. Node is runtime environment used for developing server-side web applications and Heroku is a [Platform-as-a-Servce](https://en.wikipedia.org/wiki/Platform_as_a_service) which will run our node application.
-  - #### Slack
+  #### Slack
     1. from the Slack desktop app, click on the team name in the top-left and then go to "Apps & Integrations"
     1. search for "bot" and click the top result, "Bots"
     1. click "Add Configuration" and fill in the details for the bot
     1. take note of the API Token, we'll us it later
-  - #### Github
+  1. Github
     1. make a repo on [Github](http://github.com/)
-  - #### Heroku
+  1. Heroku
     1. head over to [Heroku](https://www.heroku.com/) and login/sign up
     1. make a new app and name it something reasonable
     1. in the "Deploy" tab you can set the deployment method to **Github** and connect to the repo you made
     1. head over to "Settings" and add a Config Variable `SLACK_BOT_TOKEN` with value equal to the API token of the Slack bot
-  - #### Node.js and Node Package Manager (npm)
+  1. Node.js and Node Package Manager (npm)
     1. go ahead and follow this [guide](http://shapeshed.com/setting-up-nodejs-and-npm-on-mac-osx/)  to set up Node.js and npm (for OSX)
     1. setup your `package.json` file, which specifies settings for your Node app– it should look close to this
     ```
