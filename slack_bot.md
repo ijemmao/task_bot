@@ -2,7 +2,7 @@
 
 We'll be building a Slack bot that will send new users a welcome message. It will be a simple [Node.js](https://nodejs.org/en/) + [Express.js](http://expressjs.com/) app and run on [Heroku](https://www.heroku.com/). You can read the official documentation on Slack users [here](https://api.slack.com/bot-users).
 
-1. ### Setup
+### Setup
 We'll need to set up a few things to get started.
   1. #### Slack
      We begin by adding a bot to our Slack team.
@@ -40,4 +40,5 @@ We'll need to set up a few things to get started.
     ```
     1. the guide will have you set install express, go ahead and do that!
       - tip: when you install via `npm`, use the `--save` flag to automatically add the module to your `package.json` dependencies
-1. ### Listening for events
+
+### Listening for events
