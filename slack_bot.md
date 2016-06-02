@@ -1,4 +1,4 @@
-# Make your own Slack Bot integration
+# Make a Slack Bot!
 
 In this assignment we'll be building a Slack bot. The bot will be able to do things like respond to messages and message users as they join your Slack team. It will be a simple [Node.js](https://nodejs.org/en/) and [Express.js](http://expressjs.com/) app and run on [Heroku](https://www.heroku.com/). Don't worry if you haven't used these technologies before– all will be explained.
 
