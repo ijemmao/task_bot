@@ -66,54 +66,28 @@ Some of the technologies we'll be using are Slack, Github, Heroku, and Node.js. 
 
     which both installs and **saves** the package as a dependency in the `package.json file`, explained below.
 
-    🐻Initialize your Node app:
+    🐻 Open your project in Atom `atom .` and edit your `package.json` file, give your bot a name and add yourself as author:
+
+    Note that some stuff is already set up for you here.  This is a very basic template that includes support for es6.  We'll go through everything in here in more detail later.
+
+    🐻Notice that there are several dependencies already set up for your project.  Whenever you start working on a Node.js project that comes with a `package.json` file you should install them.
 
     ```bash
-    cd slackattack
-    npm init
+    cd slackattack  #make sure you are in the cloned project
+    npm install  #installs all the dependencies in node_modules
     ```
 
-    npm will ask you bunch of questions to prepopulate your `package.json`.  This is a file that tells node things about your app.  How to start it,  what packages it depends on, who the author is etc.  
-
-    🐻 Open your project in Atom `atom .` and massage your `package.json` file to look something like:
-
-    ```json
-    {
-      "name": "jackjack",
-      "version": "1.0.0",
-      "description": "",
-      "main": "app.js",
-      "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-      },
-      "author": "Your Name",
-      "license": "ISC"
-    }
-    ```
-
-    Note that there are no dependencies yet. Lets add one:
-
-    ```bash
-    npm install --save express
-    ```
-
+    🚩Note that `node_modules` is in the `.gitignore` file. This is because there is no reason to version control these dependencies, as they are easily reinstalled.
 
   1. **Express**
 
-    [Express](http://expressjs.com/) is a web framework for Node. Our main use for it is to let our Node app know which port it should listen to.
+    [Express](http://expressjs.com/) is a web framework for Node.
+    This can be useful if we need to control our app remotely, for now we'll leave this set up.
 
-    🐻Make a new file, `app.js`, which will be the main file of our app. This could really be named anything. Later we'll look at best practices for how to structure more complicated Express.js projects.  
+    🐻Open `app/server.js`.  This is the main file that launches your bot.
 
 
-    At the top, include things like your packages (e.g. `var express = require('express');`). Then, add this snippet of code which will let the Node app know which port to listen to.
 
-    ```
-    var app = express();
-    var port = Number(process.env.PORT || 5000);
-    app.listen(port, function() {
-      console.log("Listening on " + port);
-    });
-    ```
 
 ## Starting
 The rest of this guide is more hands-off. I'll be walking you through some overarching concepts and giving pointers, but you'll be reading the Slack documentation and learning much of the Node SDK yourself.
