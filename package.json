@@ -1,5 +1,5 @@
 {
-  "name": "example_express_with_es6",
+  "name": "slackattack",
   "version": "1.0.0",
   "description": "",
   "author": "Tim Tregubov",
@@ -13,7 +13,6 @@
   },
   "license": "ISC",
   "dependencies": {
-    "express": "^4.13.4",
     "babel-cli": "^6.10.1",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-2": "^6.5.0"

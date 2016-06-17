@@ -38,7 +38,6 @@ Some of the technologies we'll be using are Slack, Github, Heroku, and Node.js. 
 
     You can set an environment variable with `export  <name>="XXXX"` and view it with `echo $<name>`.
 
-    💻
     ```bash
     export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"
     echo $SLACK_BOT_TOKEN
@@ -86,63 +85,238 @@ Some of the technologies we'll be using are Slack, Github, Heroku, and Node.js. 
 
     🐻Open `app/server.js`.  This is the main file that launches your bot.
 
+  1. **Run Dev Mode**
+
+    You can now start your app in dev mode.
+
+    🚩In the `package.json` there is a section named `scripts`.  This happens to have a few handy things already defined for you.  In particular the dev command which you can run with `npm run dev`.
+
+    This will launch your bot in development mode!  Node will watch for any file changes and relaunch itself as needed.
+
+    ```bash
+    ➜ npm run dev
+
+    > example_express_with_es6@1.0.0 dev
+    > nodemon app/server.js --exec babel-node
+    [nodemon] 1.9.2
+    [nodemon] to restart at any time, enter `rs`
+    [nodemon] watching: *.*
+    [nodemon] starting `babel-node app/server.js`
+    listening on: 9090
+    ```
+
+## Your First Bot Words
+
+Ok so now you have a little server running, but how does it talk to Slack?
+
+1. 🐻Let's add a little library to do that. In a new Terminal window (cool thing about how we're running node in dev mode is that we can change things will it is still running):
+
+  ```bash
+  cd slackattack #make sure you are in your project direct
+  npm install --save botkit
+  ```
+
+  We are going to use [botkit](https://github.com/howdyai/botkit). Which is a cool library that for making conversation bots.  
+
+  🚩Note how as soon as that finishes running your nodemon restarts.
+
+1. Import the library.
+
+  🐻in `app/server.js` add:
+
+  ```js
+  import botkit from 'botkit';
+  // this is es6 syntax for importing libraries
+  // in older js this would be: var botkit = require('botkit')
+  ```
+
+1. Setup Bot Controller
+
+  🐻After we create the express app, lets set up botkit.
+
+  ```js
+  // botkit controller
+  const controller = Botkit.slackbot({
+    debug: false,
+  });
+
+  // initialize slackbot
+  const slackbot = controller.spawn({
+    token: process.env.SLACK_BOT_TOKEN,
+    // this grabs the slack token we exported earlier
+  }).startRTM(err => {
+    // start the real time message client
+    if (err) { throw new Error(err); }
+  });
+
+  // prepare webhook
+  // for now we won't use this but feel free to look up slack webhooks
+  controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
+    controller.createWebhookEndpoints(webserver, slackbot, () => {
+      if (err) { throw new Error(err); }
+    });
+  });
+  ```
+
+  If you notice an error: `Error: not_authed` this is because you forgot to export/set the environment variable for the SLACK_BOT_TOKEN.
+
+  🚩If you have trouble setting up your environment you can use a .env file with the [dotenv node package](https://www.npmjs.com/package/dotenv).
 
 
+1. Lets Say Hi!
 
-## Starting
-The rest of this guide is more hands-off. I'll be walking you through some overarching concepts and giving pointers, but you'll be reading the Slack documentation and learning much of the Node SDK yourself.
+  ```js
+  // example hello response
+  controller.hears(['hello', 'hi', 'howdy'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+    bot.reply(message, 'Hello there!');
+  });
+  ```
 
-  🐻[Real Time Messaging API](https://api.slack.com/rtm)
+  Give it a shot,  try direct messaging your bot in Slack!
 
-  🐻[Node Slack SDK](https://github.com/slackhq/node-slack-sdk)
+  ![](imgs/jackjack_speaks.png)
 
-The Node Slack SDK provides us with a convenient wrapper around Slack's API. Our bot connects to Slack's RTM API and opens a WebSocket connection with Slack. The connection is a long-lived bi-directional communication channel between your app and a server. The Node SDK README will help you get started with this connection. Go ahead and begin by doing the following:
+1. What about names?
 
-🐻Install the SDK npm package
+  Want the bot to respond to the user by name?
 
-🐻Establish a connection with the Slack RTM client
+  Well we have full access to [Slacks web api](https://api.slack.com/methods/users.info). Lets look up the users name.
 
-🐻Try running your app with `node web.js`– alternatively, deploy it on Heroku!
+  ```js
+  bot.api.users.info({ user: message.user }, (err, res) => {
+    if (res) {
+      bot.reply(message, `Hello, ${res.user.name}!`);
+    } else {
+      bot.reply(message, 'Hello there!');
+    }
+  });
+  ```
 
-The README will also have you listen to messages. Listening to events is incredibly important and powerful– read on for more!
+  You would do this inside of the callback to controller.hears.
 
-## Events
-The Slack server sends **events** to connected clients. These are things like [messages](https://api.slack.com/events/message) and [team join](https://api.slack.com/events/team_join) events. Events sent to your client are handled by the Node Slack package quite nicely. The following code snippet from the README listens to message events.
 
-```
-var RTM_EVENTS = require('@slack/client').RTM_EVENTS;
+## Now for the Real Stuff!
 
-rtm.on(RTM_EVENTS.MESSAGE, function (message) {
-  // Listens to all `message` events from the team
+Ok now your Bot knows how to say hi.  But lets make it do some useful stuff!
+
+The rest of this assignment is more hands-off. We'll provide some direction and resources but you'll be looking up API docs and adding more cool stuff to your bot.
+
+So far we've been using Botkit.  [Botkit](https://github.com/howdyai/botkit) has support for more complex [conversations](https://github.com/howdyai/botkit/blob/master/examples/convo_bot.js). This might come in handy.
+
+
+The Botkit library provides us with a convenient wrapper around Slack's API. Our bot connects to Slack's RTM API and opens a WebSocket connection with Slack. *If you set `debug=true` in the botkit initialization you can see how it polls the Slack servers.*
+
+### Events
+The Slack server issues **events** that are then consumed by clients. These are things like [messages](https://api.slack.com/events/message) and [team join](https://api.slack.com/events/team_join) events. Botkit can hook up to any of Slack's events.  `.hears` is a fancier way of listenining to message events.   
+
+🐻Botkit [slack event integration](https://github.com/howdyai/botkit/blob/master/readme-slack.md#slack-specific-events).
+
+For instance:
+
+```js
+controller.on('user_typing', (bot, message) => {
+  bot.reply(message, 'stop typing!');
 });
 ```
 
+will make your bot a jerk! 😡
+
+![](imgs/jackjack_is_a_jerk.png)
+
 The format of the `message` object is defined on the Slack documentation for [message events](https://api.slack.com/events/message).
 
-🐻As suggested by the README, try listening for the `AUTHENTICATED` event and log some data.
+## Make Your Bot Do More
+At this point you've achieved a general understanding of what goes into making a Slack bot and have implemented some functionalities. Now, go and see what else you can do with your Slack bot. Brainstorm, read documentation, and experiment. Make your bot the best that it can be!
+
+### Wait But Food
+
+Except first, lets make your bot actually helpful.  I am hungry, and I want your bot to suggest places to eat.
+
+🐻Add in [Yelp API for node](https://github.com/olalonde/node-yelp).
+
+🐻You'll need to [sign up and generate API keys](http://www.yelp.com/developers/getting_started/api_access
+), similar to what you had to do for Slack.
+
+Tip: Yelp results come back looking something like:
+
+```js
+{ region:
+   { span:
+      { latitude_delta: 0.718768709999992,
+        longitude_delta: 1.2334175700000003 },
+     center: { latitude: 43.667689249999995, longitude: -72.23498615 } },
+  total: 293,
+  businesses:
+   [ { is_claimed: true,
+       rating: 3.5,
+       mobile_url: 'http://m.yelp.com/biz/lui-lui-west-lebanon?utm_campaign=yelp_api&utm_medium=api_v2_search&utm_source=SP9uRBTuVFlkyH53y2dRbw',
+       rating_img_url: 'https://s3-media1.fl.yelpcdn.com/assets/2/www/img/5ef3eb3cb162/ico/stars/v1/stars_3_half.png',
+       review_count: 107,
+       name: 'Lui Lui',
+       rating_img_url_small: 'https://s3-media1.fl.yelpcdn.com/assets/2/www/img/2e909d5d3536/ico/stars/v1/stars_small_3_half.png',
+       url: 'http://www.yelp.com/biz/lui-lui-west-lebanon?utm_campaign=yelp_api&utm_medium=api_v2_search&utm_source=SP9uRBTuVFlkyH53y2dRbw',
+       categories: [Object],
+       phone: '6032987070',
+       snippet_text: 'Still in heaven over how good the food was. We stopped in Lui Lui while looking for a quick dinner spot. While we couldn\'t sit due to the wait, I ordered...',
+       image_url: 'https://s3-media2.fl.yelpcdn.com/bphoto/-yb1mjp8cvQwXqCnUUUNrw/ms.jpg',
+       snippet_image_url: 'http://s3-media3.fl.yelpcdn.com/photo/m6vlPsVGi9ln0hQM0LGylw/ms.jpg',
+       display_phone: '+1-603-298-7070',
+       rating_img_url_large: 'https://s3-media3.fl.yelpcdn.com/assets/2/www/img/bd9b7a815d1b/ico/stars/v1/stars_large_3_half.png',
+       id: 'lui-lui-west-lebanon',
+       is_closed: false,
+       location: [Object] },
+     }
+   },
+ ...]
+}
+```
+
+So you'll need to process those to filter out results you find useful.
+
+Try something like:
+
+```js
+data.businesses.forEach(business => {
+  // do something with business
+});
+```
+
+Here's some sample output that your bot too can return.  Just slack [jackjack](https://cs52-dartmouth.slack.com/messages/@jackjack/) and tell him you are `hungry`.
+
+![sample output](imgs/sample_yelp.png)
+
 
 ## Data Stores
-The message event returns some important information, like the user and channel ids. What we want is to be able to turn a user id into, for example, a name or a direct message channel. The SDK Data Store will let you do this.
 
-🐻Follow the README and set up your RTM client to also initialize a data store.
+We're not covering the datastores here. So your bot will forget conversations it has had. Botkit does provide a [storage api](https://github.com/howdyai/botkit#storing-information).
 
-The data store is extremely powerful but lacks nicely formatted documentation. However, you can use the [source code](https://github.com/slackhq/node-slack-sdk/blob/master/lib/data-store/data-store.js) as reference material.
-
-🐻Go ahead and set up a basic response system with your bot. When you receive a message say "hi" or give them an inspirational message– it's up to you!
-
-At this point you have a bot which has some sort of basic response when it receives a message. However, the bot listens to messages it receives from any channel it's part of, so your response system could get annoying if the bot is part of #general.
-
-🐻Take a look at `SlackDataStore.getChannelGroupOrDMById()` and the [objects](https://api.slack.com/types) it returns. Modify your response system to ignore messages that aren't a direct message (an "im").
-
-## Make Your Bot Your Own
-At this point you've achieved a general understanding of what goes into making a Slack bot have implemented some basic but powerful functionalities. Now, go and see what else you can do with your Slack bot. Brainstorm, read documentation, and experiment. Make your bot the best that it can be!
-
+If you want to try setting that up, its **extra credit** to have a convo that isn't only in memory.  Heroku has free Mongo addons so that might be a direction to take.
 
 
 ## Deploy On Heroku
 
-1. 🐻Head over to [Heroku](https://www.heroku.com/) and login/sign up. Then, make a new app. In the "Deploy" tab, set the deployment method to **Github** and connect to the repo you made. Head over to "Settings" and add a Config Variable `SLACK_BOT_TOKEN` with value set to the API token of the Slack bot you made in step 1.
+Ok the last step is to deploy your bot to Heroku!
 
-Heroku also requires a `Procfile` which tells Heroku what commands to run in its [dynos](https://devcenter.heroku.com/articles/dynos)
+1. 🐻Head over to [Heroku](https://www.heroku.com/) and login/sign up. Then, make a new app. In the "Deploy" tab, set the deployment method to **Github** and connect to the repo you made. Head over to "Settings" and add a Config Variable `SLACK_BOT_TOKEN` with value set to the API token of the Slack bot you made in step 1. You probably also need to add all your YELP keys, and any other API's you used.
 
-🐻Our `Procfile` is just one line, `web: node web.js`, where `web` defines the dyno type (this one receives HTTP traffic), `node` is the command and `web.js` is the name of our main Javascript file.
+1. Follow the steps under "Deploy Using Heroku Git".
+
+🚩You may have noticed a file named `Procfile` in the project. This tells Heroku what commands to run in its [dynos](https://devcenter.heroku.com/articles/dynos). Our `Procfile` is just one line, `web: npm run prod`, where `web` defines the dyno type (this one receives HTTP traffic), `npm run prod` is the command defined in `package.js` that we want to run.
+
+
+## To Turn In:
+
+* github url to your bots repo (must be readable by staff, can be public)
+* screen caps of some conversations that test your bot's functionality
+* when we talk to your bot, it should be able to:
+  * respond to hi
+  * return results for a restaurant query
+  * carry on at least one conversation
+  * send back an [*attachment* message](https://github.com/howdyai/botkit#botreply) in response to something.
+
+# Extra Credit
+
+* So many options. Be creative!
+* Maps?
+* Driving directions?
+* [MongoDB Botkit Storage](https://github.com/howdyai/botkit-storage-mongo) setup on Heroku.
