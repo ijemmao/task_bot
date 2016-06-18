@@ -313,6 +313,9 @@ Ok the last step is to deploy your bot to Heroku!
   * return results for a restaurant query
   * carry on at least one conversation
   * send back an [*attachment* message](https://github.com/howdyai/botkit#botreply) in response to something.
+  * /invite your bot to the Slack #bots channel
+* your heroku URL.  This is so we can wake up your bot if heroku sleeps your dyno. Alternatively you could add an [Outgoing Webhook](https://api.slack.com/outgoing-webhooks) that would wake up your bot for extra credit.
+
 
 # Extra Credit
 
@@ -320,3 +323,5 @@ Ok the last step is to deploy your bot to Heroku!
 * Maps?
 * Driving directions?
 * [MongoDB Botkit Storage](https://github.com/howdyai/botkit-storage-mongo) setup on Heroku.
+* [Outgoing Webhook](https://api.slack.com/outgoing-webhooks) that would wake up your bot when it hears its name in the #bots channel.
+  hint:  `controller.on('outgoing_webhook', (bot, message) => { bot.replyPublic(message, 'yeah yeah'); });
