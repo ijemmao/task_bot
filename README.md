@@ -135,7 +135,7 @@ Ok so now you have a little server running, but how does it talk to Slack?
 
   ```js
   // botkit controller
-  const controller = Botkit.slackbot({
+  const controller = botkit.slackbot({
     debug: false,
   });
 
