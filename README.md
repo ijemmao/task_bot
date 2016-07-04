@@ -6,7 +6,6 @@ Are you ready to invent the next AI?  Any self-respecting bot needs to be able t
 
 ![](http://i.giphy.com/iUaHtkDPYX3Mc.gif)
 
-As a general introduction to this guide, we'll be using the command line interface (CLI) a lot. Things that require use of the CLI will be formatted as `code`. Furthermore, the bear 🐻 you see here calls attention to action items. Do these things!
 
 ## Slack Bot Basics
 In Slack, bot users are similar to human users in that they have names, profile pictures, exist as part of the team, can post messages, invited to channels, and more. The main difference is that bots are controlled programmatically via an API that Slack provides. We'll be building a custom bot that listens to certain events, like a message or a new member joining your team, and responds accordingly.
@@ -109,14 +108,14 @@ Some of the technologies we'll be using are Slack, Github, Heroku, and Node.js. 
 
 Ok so now you have a little server running, but how does it talk to Slack?
 
-1. 🐻Let's add a little library to do that. In a new Terminal window (cool thing about how we're running node in dev mode is that we can change things will it is still running):
+1. 🐻Let's add a little library to do that. In a new Terminal window (cool thing about how we're running node in dev mode is that we can change things while it is  running and it'll pick up the changes):
 
   ```bash
   cd slackattack #make sure you are in your project direct
   npm install --save botkit
   ```
 
-  We are going to use [botkit](https://github.com/howdyai/botkit). Which is a cool library that for making conversation bots.  
+  We are going to use [botkit](https://github.com/howdyai/botkit), which is a library that helps create conversational bots.  
 
   🚩Note how as soon as that finishes running your nodemon restarts.
 
@@ -207,7 +206,7 @@ So far we've been using Botkit.  [Botkit](https://github.com/howdyai/botkit) has
 The Botkit library provides us with a convenient wrapper around Slack's API. Our bot connects to Slack's RTM API and opens a WebSocket connection with Slack. *If you set `debug=true` in the botkit initialization you can see how it polls the Slack servers.*
 
 ### Events
-The Slack server issues **events** that are then consumed by clients. These are things like [messages](https://api.slack.com/events/message) and [team join](https://api.slack.com/events/team_join) events. Botkit can hook up to any of Slack's events.  `.hears` is a fancier way of listenining to message events.   
+The Slack server issues **events** that are then consumed by clients. These are things like [messages](https://api.slack.com/events/message) and [team join](https://api.slack.com/events/team_join) events. Botkit can hook up to any of Slack's events.  `.hears` is a fancier way of listening to message events.   
 
 🐻Botkit [slack event integration](https://github.com/howdyai/botkit/blob/master/readme-slack.md#slack-specific-events).
 
@@ -281,6 +280,8 @@ data.businesses.forEach(business => {
 });
 ```
 
+instead of a c-style for loop.
+
 Here's some sample output that your bot too can return.  Just slack [jackjack](https://cs52-dartmouth.slack.com/messages/@jackjack/) and tell him you are `hungry`.
 
 ![sample output](imgs/sample_yelp.png)
@@ -291,6 +292,10 @@ Here's some sample output that your bot too can return.  Just slack [jackjack](h
 We're not covering the datastores here. So your bot will forget conversations it has had. Botkit does provide a [storage api](https://github.com/howdyai/botkit#storing-information).
 
 If you want to try setting that up, its **extra credit** to have a convo that isn't only in memory.  Heroku has free Mongo addons so that might be a direction to take.
+
+## Default/help responses
+
+Don't forget to make your bot able to respond to any messaged directed at it with at least a "what are you even talking about" — and it should also tell people what it is capable of doing for them in response to @yourbotname help
 
 
 ## Deploy On Heroku
@@ -304,17 +309,31 @@ Ok the last step is to deploy your bot to Heroku!
 🚩You may have noticed a file named `Procfile` in the project. This tells Heroku what commands to run in its [dynos](https://devcenter.heroku.com/articles/dynos). Our `Procfile` is just one line, `web: npm run prod`, where `web` defines the dyno type (this one receives HTTP traffic), `npm run prod` is the command defined in `package.js` that we want to run.
 
 
+## Outgoing Webhook
+
+Heroku dynos will typically sleep after some period of time. Your bot will not wake up automatically based on the slack RTM because that is a queue that it is your bots responsibility to check.
+
+There are ways around this, but a workaround for now would be to add an an [Outgoing Webhook](https://api.slack.com/outgoing-webhooks) that would wake up your bot.  Invite your bot to the **#bots** channel on slack and have the bot wake up on an outgoing webhook that mentions their name.  I have mine wake up on "jackjack wake up!" and send back a giphy to prove it.
+
+```javascript
+controller.on('outgoing_webhook', (bot, message) => {
+  bot.replyPublic(message, 'yeah yeah');
+});
+```
+
 ## To Turn In:
 
 * github url to your bots repo (must be readable by staff, can be public)
 * screen caps of some conversations that test your bot's functionality
 * when we talk to your bot, it should be able to:
-  * respond to hi
+  * respond to hi and random messages
   * return results for a restaurant query
   * carry on at least one conversation
   * send back an [*attachment* message](https://github.com/howdyai/botkit#botreply) in response to something.
-  * /invite your bot to the Slack #bots channel
-* your heroku URL.  This is so we can wake up your bot if heroku sleeps your dyno. Alternatively you could add an [Outgoing Webhook](https://api.slack.com/outgoing-webhooks) that would wake up your bot for extra credit.
+  * wake up on an outgoing webhook from #bots
+* your heroku URL.  This is so we can wake up your bot if heroku sleeps your dyno.
+* /invite your bot to the Slack #bots channel where we will have bot parties.
+
 
 
 # Extra Credit
@@ -323,5 +342,4 @@ Ok the last step is to deploy your bot to Heroku!
 * Maps?
 * Driving directions?
 * [MongoDB Botkit Storage](https://github.com/howdyai/botkit-storage-mongo) setup on Heroku.
-* [Outgoing Webhook](https://api.slack.com/outgoing-webhooks) that would wake up your bot when it hears its name in the #bots channel.
-  hint:  `controller.on('outgoing_webhook', (bot, message) => { bot.replyPublic(message, 'yeah yeah'); });
+* have your bot talk with another bot in #bot (requires collaboration but only on discussing how the bot conversation would go — this is still an individual assignment).  For instance, if I ask your bot for a recipe (in a DM), your bot could then use #bot to ask another bot for a suggested recipe and then return the results in the DM. This might be tricky to get right, document your "bot2bot chat api" and submit that in addition to screenshots showing the functionality.
