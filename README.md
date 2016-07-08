@@ -313,7 +313,7 @@ Ok the last step is to deploy your bot to Heroku!
 
 Heroku dynos will typically sleep after some period of time. Your bot will not wake up automatically based on the slack RTM because that is a queue that it is your bots responsibility to check.
 
-There are ways around this, but a workaround for now would be to add an an [Outgoing Webhook](https://api.slack.com/outgoing-webhooks) that would wake up your bot.  Invite your bot to the **#bots** channel on slack and have the bot wake up on an outgoing webhook that mentions their name.  I have mine wake up on "jackjack wake up!" and send back a giphy to prove it.
+There are ways around this, but a workaround for now would be to add an an [Outgoing Webhook](https://api.slack.com/outgoing-webhooks) that would wake up your bot.  Invite your bot to the **#bots** channel on slack and have the bot wake up on an outgoing webhook that mentions their name or another string.  Outgoing webhooks are configured as separate Slack integrations and require your bot to both have a public url (such as you would get when deploying on Heroku), and also have specific strings that trigger the outgoing webhook.  I have mine wake up on "jackjack wake up!" and send back a giphy to prove it.
 
 ```javascript
 controller.on('outgoing_webhook', (bot, message) => {
