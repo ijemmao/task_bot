@@ -19,90 +19,90 @@ We'll be talking a lot more about this when we start designing our own!  But for
 ## Setup
 Some of the technologies we'll be using are Slack, Github, Heroku, and Node.js. You're already familiar with Slack and Github, but Heroku and Node might be new. Node is runtime environment used for developing server-side web applications and Heroku is a [Platform-as-a-Service](https://en.wikipedia.org/wiki/Platform_as_a_service) which runs our Node application. Let's walk through these basic setup steps together.
 
-  1. **GitHub**
+1. **GitHub**
 
-    🐻Fork this repository!
+  🐻Fork this repository!
 
-  1. **Slack**
+1. **Slack**
 
-    🐻From the Slack desktop app, click on the team name in the top-left and then go to "Apps & Integrations." Search for "bot" and click the top result, "Bots." Click "Add Configuration". Choose a name for your bot and fill in the details for the bot. Take note of the API Token, we'll use it later.
+  🐻From the Slack desktop app, click on the team name in the top-left and then go to "Apps & Integrations." Search for "bot" and click the top result, "Bots." Click "Add Configuration". Choose a name for your bot and fill in the details for the bot. Take note of the API Token, we'll use it later.
 
-    ![](imgs/slack_bot_add.png)
+  ![](imgs/slack_bot_add.png)
 
-  1. **Setup Local Environment**
+1. **Setup Local Environment**
 
-    🚩Your app will need to know about the API token. This token allows you to talk to Slack's servers in an authenticated way.  API keys can be thought of as authentication for programs.
+  🚩Your app will need to know about the API token. This token allows you to talk to Slack's servers in an authenticated way.  API keys can be thought of as authentication for programs.
 
-    You'll need to have the API token as a local environment variable. This way you can run and test your Node app locally and you don't have to put your secret API key into your code — which would be a security risk as then potentially it could be used by anybody if your code was public.
+  You'll need to have the API token as a local environment variable. This way you can run and test your Node app locally and you don't have to put your secret API key into your code — which would be a security risk as then potentially it could be used by anybody if your code was public.
 
-    You can set an environment variable with `export  <name>="XXXX"` and view it with `echo $<name>`.
+  You can set an environment variable with `export  <name>="XXXX"` and view it with `echo $<name>`.
 
-    ```bash
-    export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"
-    echo $SLACK_BOT_TOKEN
-    ```
+  ```bash
+  export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"
+  echo $SLACK_BOT_TOKEN
+  ```
 
-    Note: on Windows try `set SLACK_BOT_TOKEN "TOKEN_YOU_SAVED_EARLIER"`.
+  Note: on Windows try `set SLACK_BOT_TOKEN "TOKEN_YOU_SAVED_EARLIER"`.
 
-    In our app we will be able to access this in javascript with `process.env.SLACK_BOT_TOKEN`.
+  In our app we will be able to access this in javascript with `process.env.SLACK_BOT_TOKEN`.
 
-    🚩 The above export only sets the variable for our currently running shell.  To save on OS X or Linux something akin to: `echo 'export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"' >> ~/.profile`  should do the trick, but this differs a lot by shell and operating system.
+  🚩 The above export only sets the variable for our currently running shell.  To save on OS X or Linux something akin to: `echo 'export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"' >> ~/.profile`  should do the trick, but this differs a lot by shell and operating system.
 
-  1. **Node.js and Node Package Manager (npm)**
+1. **Node.js and Node Package Manager (npm)**
 
-    🐻First, let's install [Node.js](https://nodejs.org/en/).
+  🐻First, let's install [Node.js](https://nodejs.org/en/).
 
-    macOS:
-    ```bash
-    brew install node
-    ```
+  macOS:
+  ```bash
+  brew install node
+  ```
 
-    Windows:
-    download the installer from: [Node.js](https://nodejs.org/en/)
+  Windows:
+  download the installer from: [Node.js](https://nodejs.org/en/)
 
-    Node's package manager, npm, is installed automatically with Node. It lets you install packages with`npm install <package> --save`
+  Node's package manager, npm, is installed automatically with Node. It lets you install packages with`npm install <package> --save`
 
-    which both installs and **saves** the package as a dependency in the `package.json file`, explained below.
+  which both installs and **saves** the package as a dependency in the `package.json file`, explained below.
 
-    🐻 Open your project in Atom `atom .` and edit your `package.json` file, give your bot a name and add yourself as author:
+  🐻 Open your project in Atom `atom .` and edit your `package.json` file, give your bot a name and add yourself as author:
 
-    Note that some stuff is already set up for you here.  This is a very basic template that includes support for es6.  We'll go through everything in here in more detail later.
+  Note that some stuff is already set up for you here.  This is a very basic template that includes support for es6.  We'll go through everything in here in more detail later.
 
-    🐻Notice that there are several dependencies already set up for your project.  Whenever you start working on a Node.js project that comes with a `package.json` file you should install them.
+  🐻Notice that there are several dependencies already set up for your project.  Whenever you start working on a Node.js project that comes with a `package.json` file you should install them.
 
-    ```bash
-    cd slackattack  #make sure you are in the cloned project
-    npm install  #installs all the dependencies in node_modules
-    ```
+  ```bash
+  cd slackattack  #make sure you are in the cloned project
+  npm install  #installs all the dependencies in node_modules
+  ```
 
-    🚩Note that `node_modules` is in the `.gitignore` file. This is because there is no reason to version control these dependencies, as they are easily reinstalled.
+  🚩Note that `node_modules` is in the `.gitignore` file. This is because there is no reason to version control these dependencies, as they are easily reinstalled.
 
-  1. **Express**
+1. **Express**
 
-    [Express](http://expressjs.com/) is a web framework for Node.
-    This can be useful if we need to control our app remotely, for now we'll leave this set up.
+  [Express](http://expressjs.com/) is a web framework for Node.
+  This can be useful if we need to control our app remotely, for now we'll leave this set up.
 
-    🐻Open `app/server.js`.  This is the main file that launches your bot.
+  🐻Open `app/server.js`.  This is the main file that launches your bot.
 
-  1. **Run Dev Mode**
+1. **Run Dev Mode**
 
-    You can now start your app in dev mode.
+  You can now start your app in dev mode.
 
-    🚩In the `package.json` there is a section named `scripts`.  This happens to have a few handy things already defined for you.  In particular the dev command which you can run with `npm run dev`.
+  🚩In the `package.json` there is a section named `scripts`.  This happens to have a few handy things already defined for you.  In particular the dev command which you can run with `npm run dev`.
 
-    This will launch your bot in development mode!  Node will watch for any file changes and relaunch itself as needed.
+  This will launch your bot in development mode!  Node will watch for any file changes and relaunch itself as needed.
 
-    ```bash
-    ➜ npm run dev
+  ```bash
+  ➜ npm run dev
 
-    > example_express_with_es6@1.0.0 dev
-    > nodemon app/server.js --exec babel-node
-    [nodemon] 1.9.2
-    [nodemon] to restart at any time, enter `rs`
-    [nodemon] watching: *.*
-    [nodemon] starting `babel-node app/server.js`
-    listening on: 9090
-    ```
+  > example_express_with_es6@1.0.0 dev
+  > nodemon app/server.js --exec babel-node
+  [nodemon] 1.9.2
+  [nodemon] to restart at any time, enter `rs`
+  [nodemon] watching: *.*
+  [nodemon] starting `babel-node app/server.js`
+  listening on: 9090
+  ```
 
 ## Your First Bot Words
 
