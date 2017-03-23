@@ -21,88 +21,88 @@ Some of the technologies we'll be using are Slack, Github, Heroku, and Node.js. 
 
 1. **GitHub**
 
-  🐻Fork this repository!
+    🐻Fork this repository!
 
 1. **Slack**
 
-  🐻From the Slack desktop app, click on the team name in the top-left and then go to "Apps & Integrations." Search for "bot" and click the top result, "Bots." Click "Add Configuration". Choose a name for your bot and fill in the details for the bot. Take note of the API Token, we'll use it later.
+    🐻From the Slack desktop app, click on the team name in the top-left and then go to "Apps & Integrations." Search for "bot" and click the top result, "Bots." Click "Add Configuration". Choose a name for your bot and fill in the details for the bot. Take note of the API Token, we'll use it later.
 
-  ![](imgs/slack_bot_add.png)
+    ![](imgs/slack_bot_add.png)
 
 1. **Setup Local Environment**
 
-  🚩Your app will need to know about the API token. This token allows you to talk to Slack's servers in an authenticated way.  API keys can be thought of as authentication for programs.
+    🚩Your app will need to know about the API token. This token allows you to talk to Slack's servers in an authenticated way.  API keys can be thought of as authentication for programs.
 
-  You'll need to have the API token as a local environment variable. This way you can run and test your Node app locally and you don't have to put your secret API key into your code — which would be a security risk as then potentially it could be used by anybody if your code was public.
+    You'll need to have the API token as a local environment variable. This way you can run and test your Node app locally and you don't have to put your secret API key into your code — which would be a security risk as then potentially it could be used by anybody if your code was public.
 
-  You can set an environment variable with `export  <name>="XXXX"` and view it with `echo $<name>`.
+    You can set an environment variable with `export  <name>="XXXX"` and view it with `echo $<name>`.
 
-  ```bash
-  export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"
-  echo $SLACK_BOT_TOKEN
-  ```
+    ```bash
+    export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"
+    echo $SLACK_BOT_TOKEN
+    ```
 
-  Note: on Windows try `set SLACK_BOT_TOKEN "TOKEN_YOU_SAVED_EARLIER"`.
+    Note: on Windows try `set SLACK_BOT_TOKEN "TOKEN_YOU_SAVED_EARLIER"`.
 
-  In our app we will be able to access this in javascript with `process.env.SLACK_BOT_TOKEN`.
+    In our app we will be able to access this in javascript with `process.env.SLACK_BOT_TOKEN`.
 
-  🚩 The above export only sets the variable for our currently running shell.  To save on OS X or Linux something akin to: `echo 'export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"' >> ~/.profile`  should do the trick, but this differs a lot by shell and operating system.
+    🚩 The above export only sets the variable for our currently running shell.  To save on OS X or Linux something akin to: `echo 'export SLACK_BOT_TOKEN="TOKEN_YOU_SAVED_EARLIER"' >> ~/.profile`  should do the trick, but this differs a lot by shell and operating system.
 
 1. **Node.js and Node Package Manager (npm)**
 
-  🐻First, let's install [Node.js](https://nodejs.org/en/).
+    🐻First, let's install [Node.js](https://nodejs.org/en/).
 
-  macOS:
-  ```bash
-  brew install node
-  ```
+    macOS:
+    ```bash
+    brew install node
+    ```
 
-  Windows:
-  download the installer from: [Node.js](https://nodejs.org/en/)
+    Windows:
+    download the installer from: [Node.js](https://nodejs.org/en/)
 
-  Node's package manager, npm, is installed automatically with Node. It lets you install packages with`npm install <package> --save`
+    Node's package manager, npm, is installed automatically with Node. It lets you install packages with`npm install <package> --save`
 
-  which both installs and **saves** the package as a dependency in the `package.json file`, explained below.
+    which both installs and **saves** the package as a dependency in the `package.json file`, explained below.
 
-  🐻 Open your project in Atom `atom .` and edit your `package.json` file, give your bot a name and add yourself as author:
+    🐻 Open your project in Atom `atom .` and edit your `package.json` file, give your bot a name and add yourself as author:
 
-  Note that some stuff is already set up for you here.  This is a very basic template that includes support for es6.  We'll go through everything in here in more detail later.
+    Note that some stuff is already set up for you here.  This is a very basic template that includes support for es6.  We'll go through everything in here in more detail later.
 
-  🐻Notice that there are several dependencies already set up for your project.  Whenever you start working on a Node.js project that comes with a `package.json` file you should install them.
+    🐻Notice that there are several dependencies already set up for your project.  Whenever you start working on a Node.js project that comes with a `package.json` file you should install them.
 
-  ```bash
-  cd slackattack  #make sure you are in the cloned project
-  npm install  #installs all the dependencies in node_modules
-  ```
+    ```bash
+    cd slackattack  #make sure you are in the cloned project
+    npm install  #installs all the dependencies in node_modules
+    ```
 
-  🚩Note that `node_modules` is in the `.gitignore` file. This is because there is no reason to version control these dependencies, as they are easily reinstalled.
+    🚩Note that `node_modules` is in the `.gitignore` file. This is because there is no reason to version control these dependencies, as they are easily reinstalled.
 
 1. **Express**
 
-  [Express](http://expressjs.com/) is a web framework for Node.
-  This can be useful if we need to control our app remotely, for now we'll leave this set up.
+    [Express](http://expressjs.com/) is a web framework for Node.
+    This can be useful if we need to control our app remotely, for now we'll leave this set up.
 
-  🐻Open `app/server.js`.  This is the main file that launches your bot.
+    🐻Open `app/server.js`.  This is the main file that launches your bot.
 
 1. **Run Dev Mode**
 
-  You can now start your app in dev mode.
+    You can now start your app in dev mode.
 
-  🚩In the `package.json` there is a section named `scripts`.  This happens to have a few handy things already defined for you.  In particular the dev command which you can run with `npm run dev`.
+    🚩In the `package.json` there is a section named `scripts`.  This happens to have a few handy things already defined for you.  In particular the dev command which you can run with `npm run dev`.
 
-  This will launch your bot in development mode!  Node will watch for any file changes and relaunch itself as needed.
+    This will launch your bot in development mode!  Node will watch for any file changes and relaunch itself as needed.
 
-  ```bash
-  ➜ npm run dev
+    ```bash
+    ➜ npm run dev
 
-  > example_express_with_es6@1.0.0 dev
-  > nodemon app/server.js --exec babel-node
-  [nodemon] 1.9.2
-  [nodemon] to restart at any time, enter `rs`
-  [nodemon] watching: *.*
-  [nodemon] starting `babel-node app/server.js`
-  listening on: 9090
-  ```
+    > example_express_with_es6@1.0.0 dev
+    > nodemon app/server.js --exec babel-node
+    [nodemon] 1.9.2
+    [nodemon] to restart at any time, enter `rs`
+    [nodemon] watching: *.*
+    [nodemon] starting `babel-node app/server.js`
+    listening on: 9090
+    ```
 
 ## Your First Bot Words
 
@@ -110,88 +110,88 @@ Ok so now you have a little server running, but how does it talk to Slack?
 
 1. 🐻Let's add a little library to do that. In a new Terminal window (cool thing about how we're running node in dev mode is that we can change things while it is  running and it'll pick up the changes):
 
-  ```bash
-  cd slackattack #make sure you are in your project direct
-  npm install --save botkit
-  ```
+    ```bash
+    cd slackattack #make sure you are in your project direct
+    npm install --save botkit
+    ```
 
-  We are going to use [botkit](https://github.com/howdyai/botkit), which is a library that helps create conversational bots.  
+    We are going to use [botkit](https://github.com/howdyai/botkit), which is a library that helps create conversational bots.  
 
-  🚩Note how as soon as that finishes running your nodemon restarts.
+    🚩Note how as soon as that finishes running your nodemon restarts.
 
 1. Import the library.
 
-  🐻in `app/server.js` add:
+    🐻in `app/server.js` add:
 
-  ```js
-  import botkit from 'botkit';
-  // this is es6 syntax for importing libraries
-  // in older js this would be: var botkit = require('botkit')
-  ```
+    ```js
+    import botkit from 'botkit';
+    // this is es6 syntax for importing libraries
+    // in older js this would be: var botkit = require('botkit')
+    ```
 
 1. Setup Bot Controller
 
-  🐻After we create the express app, lets set up botkit.
+    🐻After we create the express app, lets set up botkit.
 
-  ```js
-  // botkit controller
-  const controller = botkit.slackbot({
-    debug: false,
-  });
+    ```js
+    // botkit controller
+    const controller = botkit.slackbot({
+      debug: false,
+    });
 
-  // initialize slackbot
-  const slackbot = controller.spawn({
-    token: process.env.SLACK_BOT_TOKEN,
-    // this grabs the slack token we exported earlier
-  }).startRTM(err => {
-    // start the real time message client
-    if (err) { throw new Error(err); }
-  });
-
-  // prepare webhook
-  // for now we won't use this but feel free to look up slack webhooks
-  controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
-    controller.createWebhookEndpoints(webserver, slackbot, () => {
+    // initialize slackbot
+    const slackbot = controller.spawn({
+      token: process.env.SLACK_BOT_TOKEN,
+      // this grabs the slack token we exported earlier
+    }).startRTM(err => {
+      // start the real time message client
       if (err) { throw new Error(err); }
     });
-  });
-  ```
 
-  If you notice an error: `Error: not_authed` this is because you forgot to export/set the environment variable for the SLACK_BOT_TOKEN.
+    // prepare webhook
+    // for now we won't use this but feel free to look up slack webhooks
+    controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
+      controller.createWebhookEndpoints(webserver, slackbot, () => {
+        if (err) { throw new Error(err); }
+      });
+    });
+    ```
 
-  🚩If you have trouble setting up your environment you can use a .env file with the [dotenv node package](https://www.npmjs.com/package/dotenv).
+    If you notice an error: `Error: not_authed` this is because you forgot to export/set the environment variable for the SLACK_BOT_TOKEN.
+
+    🚩If you have trouble setting up your environment you can use a .env file with the [dotenv node package](https://www.npmjs.com/package/dotenv).
 
 
 1. Lets Say Hi!
 
-  ```js
-  // example hello response
-  controller.hears(['hello', 'hi', 'howdy'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
-    bot.reply(message, 'Hello there!');
-  });
-  ```
+    ```js
+    // example hello response
+    controller.hears(['hello', 'hi', 'howdy'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+      bot.reply(message, 'Hello there!');
+    });
+    ```
 
-  Give it a shot,  try direct messaging your bot in Slack!
+    Give it a shot,  try direct messaging your bot in Slack!
 
-  ![](imgs/jackjack_speaks.png)
+    ![](imgs/jackjack_speaks.png)
 
 1. What about names?
 
-  Want the bot to respond to the user by name?
+    Want the bot to respond to the user by name?
 
-  Well we have full access to [Slacks web api](https://api.slack.com/methods/users.info). Lets look up the users name.
+    Well we have full access to [Slacks web api](https://api.slack.com/methods/users.info). Lets look up the users name.
 
-  ```js
-  bot.api.users.info({ user: message.user }, (err, res) => {
-    if (res) {
-      bot.reply(message, `Hello, ${res.user.name}!`);
-    } else {
-      bot.reply(message, 'Hello there!');
-    }
-  });
-  ```
+    ```js
+    bot.api.users.info({ user: message.user }, (err, res) => {
+      if (res) {
+        bot.reply(message, `Hello, ${res.user.name}!`);
+      } else {
+        bot.reply(message, 'Hello there!');
+      }
+    });
+    ```
 
-  You would do this inside of the callback to controller.hears.
+    You would do this inside of the callback to controller.hears.
 
 
 ## Now for the Real Stuff!
