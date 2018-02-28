@@ -44,6 +44,6 @@ controller.on('direct_message', (bot, message) => {
     if (res) {
       channelMessages[res.user.id].messageTimes.push(message.ts)
     }
-    bot.reply('Logged your message')
+    bot.reply(message, 'Logged your message')
   })
 })
