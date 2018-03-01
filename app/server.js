@@ -1,7 +1,5 @@
 import botkit from 'botkit'
 
-console.log('starting bot')
-
 let channelMessages = []
 
 // botkit controller
