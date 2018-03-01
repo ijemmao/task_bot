@@ -1,7 +1,6 @@
 import botkit from 'botkit'
 import schedule from 'node-schedule';
-
-console.log('starting bot');
+import data from '../mock_data/milestones'
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -31,18 +30,32 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 /************************* milestones *************************/
 
 var channels = ['C9G17060H', 'C9G073P2N'];  // dummy channel list
+var milestone = 'It\'s milestone time!\n' + data.milestones.one.overview + '\n';
+
+for (var item in data.milestones.one.everyone) {
+  milestone += (data.milestones.one.everyone[item] + '\n');
+}
+
+for (item in data.milestones.one.pm) {
+  milestone += (data.milestones.one.pm[item] + '\n');
+}
+
+for (item in data.milestones.one.deliverables) {
+  milestone += (data.milestones.one.deliverables[item] + '\n');
+}
 
 // schedule milestone message for Wednesday after the Lab meeting
 var rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = 3;
-rule.hour = 18;
-rule.minute = 23;
-rule.second = 10;
- 
+rule.hour = 19;
+rule.minute = 40;
+rule.second = 59;
+
+// post milestones message in each channel in channels list 
 var milestones = schedule.scheduleJob(rule, function(){
   for (var i = 0; i < channels.length; i++) {
     slackbot.say( {
-      text: 'It\'s milestone time!',
+      text: milestone,
       channel: channels[i]
     });
   }
