@@ -2,7 +2,7 @@ import botkit from 'botkit'
 
 console.log('starting bot')
 
-let channelMessages = {}
+let channelMessages = []
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -35,15 +35,17 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 // messages stored in dictionary that holds:
 //    1. user id
 //    2. message timestamp
-controller.on('direct_message', (bot, message) => {
+controller.on(['ambient', 'direct_message'], (bot, message) => {
   bot.api.users.info({ user: message.user }, (err, res) => {
     if (err) return err
-    if (!channelMessages[res.user.id]) {
-      channelMessages[res.user.id] = { messageTimes: [] }
+    if (!channelMessages[message.channel]) {
+      channelMessages[message.channel] = {}
     }
     if (res) {
-      channelMessages[res.user.id].messageTimes.push(message.ts)
+      if (!channelMessages[message.channel][res.user.id]) {
+        channelMessages[message.channel][res.user.id] = []
+      }
+      channelMessages[message.channel][res.user.id].push(message.ts)
     }
-    bot.reply(message, 'Logged your message')
   })
 })
