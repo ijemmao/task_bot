@@ -1,6 +1,7 @@
-import botkit from 'botkit'
+import botkit from 'botkit';
 import schedule from 'node-schedule';
-import data from '../mock_data/milestones'
+import data from '../mock_data/milestones';
+import * as markdown from "./markdown.js";
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -30,31 +31,23 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 /************************* milestones *************************/
 
 var channels = ['C9G17060H', 'C9G073P2N'];  // dummy channel list
-var milestone = '_It\'s milestone time!_\n\n' + ('*' + Object.keys(data.milestones.one)[0] + ':* ') + data.milestones.one.Overview + '\n';
-
-milestone += ('\n*' + Object.keys(data.milestones.one)[1].toUpperCase() + '*:' + '\n');
-for (var item in data.milestones.one.Everyone) {
-  milestone += ('\t• ' + data.milestones.one.Everyone[item] + '\n');
-}
-
-milestone += ('\n*' + Object.keys(data.milestones.one)[2].toUpperCase() + '*:' + '\n');
-for (item in data.milestones.one.PM) {
-  milestone += ('\t• ' + data.milestones.one.PM[item] + '\n');
-}
-
-milestone += ('\n*' + Object.keys(data.milestones.one)[3].toUpperCase() + '*:' + '\n');
-for (item in data.milestones.one.Deliverables) {
-  milestone += ('\t• ' +data.milestones.one.Deliverables[item] + '\n');
-}
-
-milestone += ('\n*' + data.milestones.one.More + "*");
+var milestone = '_It\'s milestone time!_\n\n' // create milestone message.
+              + markdown.formatHeader(Object.keys(data.milestones.one)[0]) 
+              + data.milestones.one.Overview + '\n'
+              + markdown.formatHeader(Object.keys(data.milestones.one)[1]) 
+              + '\n' + markdown.formatLists(data.milestones.one.Everyone) 
+              + markdown.formatHeader(Object.keys(data.milestones.one)[2])
+              + markdown.formatLists(data.milestones.one.PM)
+              + markdown.formatHeader(Object.keys(data.milestones.one)[3])
+              + markdown.formatLists(data.milestones.one.Deliverables)
+              + ('\n*' + data.milestones.one.More + "*");
 
 // schedule milestone message for Wednesday after the Lab meeting
 var rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = 3;
-rule.hour = 20;
-rule.minute = 15;
-rule.second = 0;
+rule.hour = 21;
+rule.minute = 46;
+rule.second = 30;
 
 // post milestones message in each channel in channels list 
 var milestones = schedule.scheduleJob(rule, function(){
