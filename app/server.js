@@ -31,10 +31,11 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 })
 
 
-// listens for any comment made by user
-// messages stored in dictionary that holds:
-//    1. user id
-//    2. message timestamp
+/*
+ * Listens for any comment from any channel
+ * Uses data structure that keeps track of each channel
+ * it's respective members, and their comments
+ */
 controller.on(['ambient', 'direct_message'], (bot, message) => {
   bot.api.users.info({ user: message.user }, (err, res) => {
     if (err) return err
