@@ -1,25 +1,22 @@
 {
     "milestones" : {
         "one" : {
-            "overview" : "In Week 1, work with your partner and team to understand the problem, stakeholder and partner requirements, and the project scope.",
-            "everyone" : {
+            "Overview" : "In Week 1, work with your partner and team to understand the problem, stakeholder and partner requirements, and the project scope.",
+            "Everyone" : {
                 "0" : "Review the Partner Brief",
-                "1" : "Team Meeting",
-                "2" : "Kickoff Meeting",
-                "3" : "Reframe the Problem",
-                "4" : "Competitive Research"
+                "1" : "Kickoff Meeting",
+                "2" : "Competitive Research"
             },
-            "pm" : {
+            "PM" : {
                 "0" : "Populate backlog with tasks for the next two weeks",
-                "1" : "Set up and prep for team meeting",
-                "2" : "Set a up a Kickoff meeting with the partner",
-                "3" : "Set roadmap",
-                "4" : "Set up User Research to be conducted next week"
+                "1" : "Set roadmap",
+                "2" : "Set up User Research to be conducted next week"
             },
-            "deliverables" : {
+            "Deliverables" : {
                 "0" : "Discovery Phase worksheet (Send to your mentors and Erica)",
                 "1" : "Competitive Research"
-            }
+            },
+            "More" : "But wait, there's more! Check out https://build.dali.dartmouth.edu for the full list of tasks."
         }
     }
 }

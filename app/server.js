@@ -30,26 +30,31 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 /************************* milestones *************************/
 
 var channels = ['C9G17060H', 'C9G073P2N'];  // dummy channel list
-var milestone = 'It\'s milestone time!\n' + data.milestones.one.overview + '\n';
+var milestone = '_It\'s milestone time!_\n\n' + ('*' + Object.keys(data.milestones.one)[0] + ':* ') + data.milestones.one.Overview + '\n';
 
-for (var item in data.milestones.one.everyone) {
-  milestone += (data.milestones.one.everyone[item] + '\n');
+milestone += ('\n*' + Object.keys(data.milestones.one)[1].toUpperCase() + '*:' + '\n');
+for (var item in data.milestones.one.Everyone) {
+  milestone += ('\t• ' + data.milestones.one.Everyone[item] + '\n');
 }
 
-for (item in data.milestones.one.pm) {
-  milestone += (data.milestones.one.pm[item] + '\n');
+milestone += ('\n*' + Object.keys(data.milestones.one)[2].toUpperCase() + '*:' + '\n');
+for (item in data.milestones.one.PM) {
+  milestone += ('\t• ' + data.milestones.one.PM[item] + '\n');
 }
 
-for (item in data.milestones.one.deliverables) {
-  milestone += (data.milestones.one.deliverables[item] + '\n');
+milestone += ('\n*' + Object.keys(data.milestones.one)[3].toUpperCase() + '*:' + '\n');
+for (item in data.milestones.one.Deliverables) {
+  milestone += ('\t• ' +data.milestones.one.Deliverables[item] + '\n');
 }
+
+milestone += ('\n*' + data.milestones.one.More + "*");
 
 // schedule milestone message for Wednesday after the Lab meeting
 var rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = 3;
-rule.hour = 19;
-rule.minute = 40;
-rule.second = 59;
+rule.hour = 20;
+rule.minute = 15;
+rule.second = 0;
 
 // post milestones message in each channel in channels list 
 var milestones = schedule.scheduleJob(rule, function(){
