@@ -28,7 +28,6 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
   })
 })
 
-
 /*
  * Listens for any comment from any channel
  * Uses data structure that keeps track of each channel
