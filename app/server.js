@@ -13,8 +13,6 @@ const controller = botkit.slackbot({
   debug: false,
 })
 
-let channelMessages = []
-
 // initialize slackbot
 const slackbot = controller.spawn({
   token: process.env.TASK_BOT_TOKEN,
@@ -120,19 +118,18 @@ rule.minute = 0
 rule.second = 0
 
 // if the current date is within the start and end date range
-if (moment().range(startDate, endDate) && currentWeek <= 8) {
-
-  // post milestones message in each channel in channels list if it's the corresponding time
-  schedule.scheduleJob(r => {
-    channels.forEach(channel => {
-      slackbot.say({
-        text: getMilestone(currentWeek),
-        channel,
-      })
-      currentWeek += 1
-    })
-  })
-}
+// if (moment().range(startDate, endDate) && currentWeek <= 8) {
+//   // post milestones message in each channel in channels list if it's the corresponding time
+//   schedule.scheduleJob(r => {
+//     channels.forEach(channel => {
+//       slackbot.say({
+//         text: getMilestone(currentWeek),
+//         channel,
+//       })
+//       currentWeek += 1
+//     })
+//   })
+// }
 
 controller.hears('add_user', ['direct_message'], (bot, message) => {
   bot.reply(message, 'alright')
