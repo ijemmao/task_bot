@@ -70,9 +70,8 @@ controller.hears('add_all_users', ['ambient', 'direct_message'], (bot, message) 
  * Adds a specified user
  */
 controller.hears('add_user', ['direct_message'], (bot, message) => {
-  const words = message.text.split(/[ <>@]/).filter(item => item.length > 0)
-  console.log(words)
-  bot.api.users.info({ user: words[1] }, (err, res) => {
+  const newUser = message.text.split(/[ <>@]/).filter(item => item.length > 0)[0]
+  bot.api.users.info({ user: newUser }, (err, res) => {
     createUser(res.user)
     console.log('success')
   })
