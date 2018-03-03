@@ -60,20 +60,20 @@ controller.hears('add_all_users', ['ambient', 'direct_message'], (bot, message) 
     res.members.forEach(member => {
       // only takes users that have a first and last name
       if (member.profile.first_name && member.profile.last_name) {
-        createUser({ id: member.id, name: member.name, firstName: member.profile.first_name, lastName: member.profile.last_name })
+        createUser(member)
       }
     })
   })
-  // bot.api.users.info({ user: message.user }, (err, res) => {
-  //   const newUser = new User({
-  //     id: res.user.id,
-  //     username: res.user.name,
-  //     firstName: res.user.profile.first_name,
-  //     lastName: res.user.profile.last_name,
-  //   })
-  //   newUser.save((err, response) => {
-  //     if (err) return err
-  //     bot.reply(message, `Added ${res.user.name} to the database`)
-  //   })
-  // })
+})
+
+/*
+ * Adds a specified user
+ */
+controller.hears('add_user', ['direct_message'], (bot, message) => {
+  const words = message.text.split(/[ <>@]/).filter(item => item.length > 0)
+  console.log(words)
+  bot.api.users.info({ user: words[1] }, (err, res) => {
+    createUser(res.user)
+    console.log('success')
+  })
 })
