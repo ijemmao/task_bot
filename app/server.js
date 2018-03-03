@@ -50,11 +50,22 @@ controller.on(['ambient', 'direct_message'], (bot, message) => {
   })
 })
 
-controller.hears('add_user', ['direct_message'], (bot, message) => {
-  bot.reply(message, 'alright')
-  const newUser = new User({ id: '0000', name: 'ijemmao', channels: [] })
-  newUser.save((err, res) => {
-    if (err) return err
-    console.log('completed database insertion')
+/*
+ * Adds the user that called the command
+ */
+
+controller.hears('add_user', ['ambient'], (bot, message) => {
+  bot.api.users.info({ user: message.user }, (err, res) => {
+    console.log(res)
+    const newUser = new User({
+      id: res.user.id,
+      username: res.user.name,
+      firstName: res.user.profile.first_name,
+      lastName: res.user.profile.last_name,
+    })
+    newUser.save((err, res) => {
+      if (err) return err
+      bot.reply(message, 'Added current user!')
+    })
   })
 })
