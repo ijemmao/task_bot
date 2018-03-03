@@ -1,5 +1,6 @@
 import botkit from 'botkit'
 import * as db from './db'
+import User from './../models/user'
 
 let channelMessages = []
 
@@ -46,5 +47,14 @@ controller.on(['ambient', 'direct_message'], (bot, message) => {
       }
       channelMessages[message.channel][res.user.id].push(message.ts)
     }
+  })
+})
+
+controller.hears('add_user', ['direct_message'], (bot, message) => {
+  bot.reply(message, 'alright')
+  const newUser = new User({ id: '0000', name: 'ijemmao', channels: [] })
+  newUser.save((err, res) => {
+    if (err) return err
+    console.log('completed database insertion')
   })
 })
