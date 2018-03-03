@@ -1,4 +1,5 @@
 import botkit from 'botkit'
+import * as db from './db'
 
 let channelMessages = []
 
