@@ -1,6 +1,7 @@
 import botkit from 'botkit'
 import * as db from './db'
 import User from './../models/user'
+import { createUser } from './../db-actions/user-actions'
 
 let channelMessages = []
 
@@ -35,7 +36,7 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
  * Uses data structure that keeps track of each channel
  * it's respective members, and their comments
  */
-controller.on(['ambient', 'direct_message'], (bot, message) => {
+controller.on(['ambient'], (bot, message) => {
   bot.api.users.info({ user: message.user }, (err, res) => {
     if (err) return err
     if (!channelMessages[message.channel]) {
@@ -51,19 +52,28 @@ controller.on(['ambient', 'direct_message'], (bot, message) => {
 })
 
 /*
- * Adds the user that called the command
+ * Adds all users into the database
  */
-controller.hears('add_user', ['direct_message', 'direct_message'], (bot, message) => {
-  bot.api.users.info({ user: message.user }, (err, res) => {
-    const newUser = new User({
-      id: res.user.id,
-      username: res.user.name,
-      firstName: res.user.profile.first_name,
-      lastName: res.user.profile.last_name,
-    })
-    newUser.save((err, response) => {
-      if (err) return err
-      bot.reply(message, `Added ${res.user.name} to the database`)
+controller.hears('add_all_users', ['ambient', 'direct_message'], (bot, message) => {
+  bot.api.users.list({}, (err, res) => {
+    if (err) return err
+    res.members.forEach(member => {
+      // only takes users that have a first and last name
+      if (member.profile.first_name && member.profile.last_name) {
+        createUser({ id: member.id, name: member.name, firstName: member.profile.first_name, lastName: member.profile.last_name })
+      }
     })
   })
+  // bot.api.users.info({ user: message.user }, (err, res) => {
+  //   const newUser = new User({
+  //     id: res.user.id,
+  //     username: res.user.name,
+  //     firstName: res.user.profile.first_name,
+  //     lastName: res.user.profile.last_name,
+  //   })
+  //   newUser.save((err, response) => {
+  //     if (err) return err
+  //     bot.reply(message, `Added ${res.user.name} to the database`)
+  //   })
+  // })
 })
