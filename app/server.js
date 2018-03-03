@@ -1,4 +1,5 @@
 import botkit from 'botkit'
+<<<<<<< HEAD
 import schedule from 'node-schedule'
 import data from '../mock_data/milestones' 
 import moment from 'moment'
@@ -8,6 +9,15 @@ import * as markdown from './markdown.js'
 const controller = botkit.slackbot({
   debug: false, 
 }) 
+=======
+
+let channelMessages = []
+
+// botkit controller
+const controller = botkit.slackbot({
+  debug: false,
+})
+>>>>>>> 06cbef6fb3912af0b94aa92e349c76cdd5057bbf
 
 // initialize slackbot
 const slackbot = controller.spawn({
@@ -16,14 +26,21 @@ const slackbot = controller.spawn({
 }).startRTM(err => {
   // start the real time message client
   if (err) {
+<<<<<<< HEAD
     throw new Error(err) 
   }
 }) 
+=======
+    throw new Error(err)
+  }
+})
+>>>>>>> 06cbef6fb3912af0b94aa92e349c76cdd5057bbf
 
 // prepare webhook
 controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
   controller.createWebhookEndpoints(webserver, slackbot, () => {
     if (err) {
+<<<<<<< HEAD
       throw new Error(err) 
     }
   }) 
@@ -88,3 +105,29 @@ function getMilestone(week) {
 
   return milestone
 }
+=======
+      throw new Error(err)
+    }
+  })
+})
+
+/*
+ * Listens for any comment from any channel
+ * Uses data structure that keeps track of each channel
+ * it's respective members, and their comments
+ */
+controller.on(['ambient', 'direct_message'], (bot, message) => {
+  bot.api.users.info({ user: message.user }, (err, res) => {
+    if (err) return err
+    if (!channelMessages[message.channel]) {
+      channelMessages[message.channel] = {}
+    }
+    if (res) {
+      if (!channelMessages[message.channel][res.user.id]) {
+        channelMessages[message.channel][res.user.id] = []
+      }
+      channelMessages[message.channel][res.user.id].push(message.ts)
+    }
+  })
+})
+>>>>>>> 06cbef6fb3912af0b94aa92e349c76cdd5057bbf
