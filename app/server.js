@@ -57,7 +57,7 @@ controller.on(['ambient', 'direct_message', 'file_share'], (bot, message) => {
 /*
  * Adds all users into the database
  */
-controller.hears('add_all_users', ['ambient', 'direct_message'], (bot, message) => {
+controller.hears('add_all_users', ['direct_message'], (bot, message) => {
   bot.api.users.list({}, (err, res) => {
     if (err) return err
     res.members.forEach(member => {
@@ -73,7 +73,7 @@ controller.hears('add_all_users', ['ambient', 'direct_message'], (bot, message) 
  * Adds a specified user
  */
 controller.hears('add_user', ['direct_message'], (bot, message) => {
-  const newUser = message.text.split(/[ <>@]/).filter(item => item.length > 0)[0]
+  const newUser = message.text.split(/[ <>@]/).filter(item => item.length > 0)[1]
   bot.api.users.info({ user: newUser }, (err, res) => {
     createUser(res.user)
     console.log('success')
@@ -142,12 +142,3 @@ rule.second = 0
 //     })
 //   })
 // }
-
-controller.hears('add_user', ['direct_message'], (bot, message) => {
-  bot.reply(message, 'alright')
-  const newUser = new User({ id: '0000', name: 'ijemmao', channels: [] })
-  newUser.save((err, res) => {
-    if (err) return err
-    console.log('completed database insertion')
-  })
-})
