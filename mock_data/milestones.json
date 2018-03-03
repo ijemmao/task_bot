@@ -1,22 +1,176 @@
-{
-    "milestones" : {
-        "one" : {
-            "Overview" : "In Week 1, work with your partner and team to understand the problem, stakeholder and partner requirements, and the project scope.",
-            "Everyone" : {
-                "0" : "Review the Partner Brief",
-                "1" : "Kickoff Meeting",
-                "2" : "Competitive Research"
-            },
-            "PM" : {
-                "0" : "Populate backlog with tasks for the next two weeks",
-                "1" : "Set roadmap",
-                "2" : "Set up User Research to be conducted next week"
-            },
-            "Deliverables" : {
-                "0" : "Discovery Phase worksheet (Send to your mentors and Erica)",
-                "1" : "Competitive Research"
-            },
-            "More" : "But wait, there's more! Check out https://build.dali.dartmouth.edu for the full list of tasks."
+[
+    {
+        "milestone": 1,
+        "title": "Welcome, Kick-off Meeting",
+        "Overview" : "In Week 1, work with your partner and team to understand the problem, stakeholder and partner requirements, and the project scope.",
+        "Everyone" : {
+            "0" : "Review the Partner Brief",
+            "1" : "Kickoff Meeting",
+            "2" : "Competitive Research"
+        },
+        "PM" : {
+            "0" : "Populate backlog with tasks for the next two weeks",
+            "1" : "Set roadmap",
+            "2" : "Set up User Research to be conducted next week"
+        },
+        "Deliverables" : {
+            "0" : "Discovery Phase worksheet (Send to your mentors and Erica)",
+            "1" : "Competitive Research"
+        }
+    }, 
+    {
+        "milestone": 2,
+        "title": "Research and Code Experiment",
+        "Overview" : "Interview users to understand their problem, and create personas. Conduct code experiment 0.",
+        "Everyone" : {
+            "0" : "Personas: based on the user research. Aim to create these together in your team meeting!"
+        },
+        "PM" : {
+            "0" : "User Research: help conduct (if needed) and follow-up correspondence",
+            "1" : "Write Project Proposal",
+            "2" : "Meet with the team to define Feature Spec and define project scope"
+        },
+        "Dev" : {
+            "0" : "Code Experiment 0"
+        },
+        "Des" : {
+            "0" : "User Research",
+            "1" : "Inspiration Board"
+        },
+        "Deliverables" : {
+            "0" : "Code Experiment 0",
+            "1" : "Inspiration Board",
+            "2" : "Personas"
+        } 
+    },
+    {
+        "milestone": 3,
+        "title": "Define and Code Experiment",
+        "Overview" : "Define the core features and sketch those features as a team. Present sketched options to your partner for feedback and a design direction. Conduct code experiment 1.",
+        "PM" : {
+            "0" : "Define milestones for next three weeks",
+            "1" : "Gather all content/data from the partner",
+            "2" : "Set up Rapid User Testing for next week"
+        },
+        "Dev" : {
+            "0" : "Code Experiment 1 OR start on code scaffolding"
+        },
+        "Des" : {
+            "0" : "Connecting features",
+            "1" : "Paper sketching"
+        },
+        "Deliverables" : {
+            "0" : "Paper sketches",
+            "1" : "Code Experiment 1"
+        } 
+    },
+    {
+        "milestone": 4,
+        "title": "Grayscales™, Code Scaffolding",
+        "Overview" : "Create Grayscales™ for each main interaction and screen. Conduct rapid user testing to validate design solutions. Setup initial code scaffolding with tools and frameworks chosen.",
+        "PM" : {
+            "0" : "Evaluate team velocity",
+            "1" : "Write a brief team update for DALI PR"
+        },
+        "Dev" : {
+            "0" : "Code scaffolding"
+        },
+        "Des" : {
+            "0" : "Grayscales™",
+            "1" : "Rapid User Testing"
+        },
+        "Deliverables" : {
+            "0" : "Code scaffolding",
+            "1" : "Grayscales",
+            "2" : "User Testing Summary"
+        } 
+    },
+    {
+        "milestone": 5,
+        "title": "Style Guide, Rudimentary Functionality",
+        "Overview" : "Settle on a style guide and apply to all screens, including insights gained from user testing. Connect all necessary code components together. Rudimentary functionality in place and components are connected and exchange data.",
+        "PM" : {
+            "0" : "Team Retrospective",
+            "1" : "Check in with team about their individual goals"
+        },
+        "Dev" : {
+            "0" : "Data and component wiring"
+        },
+        "Des" : {
+            "0" : "High Fidelity Mockups",
+            "1" : "Style Guide"
+        },
+        "Deliverables" : {
+            "0" : "Initial Hi-Fi mockups and Style Guide"
+        } 
+    },
+    {
+        "milestone": 6,
+        "title": "Refine and Functionality",
+        "Overview" : "Refine designs and have basic functionality in place.",
+        "PM" : {
+            "0" : "Triage bugs that arose from testing",
+            "1" : "Address any scope questions and/or changes",
+            "2" : "Meet with the team to define Feature Spec and define project scope"
+        },
+        "Dev" : {
+            "0" : "Basic functionality"
+        },
+        "Des" : {
+            "0" : "Refine designs"
+        },
+        "Deliverables" : {
+            "0" : "Completed Hi-Fi mockups in a click through prototype"
+        } 
+    },
+    {
+        "milestone": 7,
+        "title": "Add Delight, Bughunt",
+        "Overview" : "Solidify designs and add in delightful features and interactions. Focus on function over form to get MVP functionality complete. Participate in a bughunt. Help other teams find bugs in the demos!",
+        "Everyone" : {
+            "0" : "Bughunt"
+        },
+        "PM" : {
+            "0" : "Triage bugs",
+            "1" : "Get App on Testflight/website hosted on Github pages"
+        },
+        "Dev" : {
+            "0" : "MVP functionality"
+        },
+        "Des" : {
+            "0" : "Add Delight",
+            "1" : "Close out open comments and feedback"
+        }
+    },
+    {
+        "milestone": 8,
+        "title": "Design Docs and Bug Fixes",
+        "Overview" : "Create design documentation such as style guides and demo videos. Iterate fixing bugs from bug-hunt.",
+        "PM" : {
+            "0" : "Prep Handoff Material",
+            "1" : "Prep for DALI Demos (Technigala)",
+            "2" : "Final Partner meeting"
+        },
+        "Dev" : {
+            "0" : "Bug-fixing and refinement"
+        },
+        "Des" : {
+            "0" : "Assist Dev with identifying bugs",
+            "1" : "Design Package"
+        }
+    },
+    {
+        "milestone": 9,
+        "title": "DEMOS and User Feedback",
+        "Overview" : "MVP demos and testing of the projects for this term. The main focus will be on getting user feedback. Science fair style. Open to public.",
+        "Everyone" : {
+            "0" : "Show off your work!"
+        },
+        "PM" : {
+            "0" : "Finish any lingering issues",
+            "1" : "Wrap up handoff documents",
+            "2" : "Send Handoff documents to partner (after approval from staff)",
+            "3" : "Celebrate and post-mortem with the team"
         }
     }
-}
+]
