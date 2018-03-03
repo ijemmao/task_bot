@@ -4,6 +4,7 @@ import data from '../mock_data/milestones'
 import moment from 'moment'
 import * as markdown from './markdown.js' 
 import * as db from './db'
+import User from './../models/user'
 
 let channelMessages = []
 
@@ -120,3 +121,12 @@ let getMilestone = (week) => {
 
   return milestone
 }
+
+controller.hears('add_user', ['direct_message'], (bot, message) => {
+  bot.reply(message, 'alright')
+  const newUser = new User({ id: '0000', name: 'ijemmao', channels: [] })
+  newUser.save((err, res) => {
+    if (err) return err
+    console.log('completed database insertion')
+  })
+})
