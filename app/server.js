@@ -33,8 +33,9 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
  * Uses data structure that keeps track of each channel
  * it's respective members, and their comments
  */
-controller.on(['ambient', 'direct_message'], (bot, message) => {
+controller.on(['ambient', 'direct_message', 'file_share'], (bot, message) => {
   bot.api.users.info({ user: message.user }, (err, res) => {
+    console.log(message)
     if (err) return err
     if (!channelMessages[message.channel]) {
       channelMessages[message.channel] = {}
@@ -43,7 +44,14 @@ controller.on(['ambient', 'direct_message'], (bot, message) => {
       if (!channelMessages[message.channel][res.user.id]) {
         channelMessages[message.channel][res.user.id] = []
       }
-      channelMessages[message.channel][res.user.id].push(message.ts)
+      channelMessages[message.channel][res.user.id].push({ timestamp: message.ts, type: message.type })
     }
   })
+})
+
+/*
+ * Listens for database printout
+ */
+controller.hears(['show'], ['direct_message'], (bot, message) => {
+  console.log(channelMessages)
 })
