@@ -11,11 +11,6 @@ const controller = botkit.slackbot({
 
 let channelMessages = []
 
-// botkit controller
-const controller = botkit.slackbot({
-  debug: false,
-})
-
 // initialize slackbot
 const slackbot = controller.spawn({
   token: process.env.SLACK_BOT_TOKEN,
