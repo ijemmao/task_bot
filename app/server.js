@@ -53,19 +53,17 @@ controller.on(['ambient', 'direct_message'], (bot, message) => {
 /*
  * Adds the user that called the command
  */
-
 controller.hears('add_user', ['ambient'], (bot, message) => {
   bot.api.users.info({ user: message.user }, (err, res) => {
-    console.log(res)
     const newUser = new User({
       id: res.user.id,
       username: res.user.name,
       firstName: res.user.profile.first_name,
       lastName: res.user.profile.last_name,
     })
-    newUser.save((err, res) => {
+    newUser.save((err, response) => {
       if (err) return err
-      bot.reply(message, 'Added current user!')
+      bot.reply(message, `Added ${res.user.name} to the database`)
     })
   })
 })
