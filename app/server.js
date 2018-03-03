@@ -35,7 +35,6 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
  */
 controller.on(['ambient', 'direct_message', 'file_share'], (bot, message) => {
   bot.api.users.info({ user: message.user }, (err, res) => {
-    console.log(message)
     if (err) return err
     if (!channelMessages[message.channel]) {
       channelMessages[message.channel] = {}
