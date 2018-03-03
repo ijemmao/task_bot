@@ -5,6 +5,7 @@ import moment from 'moment'
 import * as markdown from './markdown.js' 
 import * as db from './db'
 import User from './../models/user'
+import { createUser } from './../db-actions/user-actions'
 
 let channelMessages = []
 
@@ -53,18 +54,29 @@ controller.on(['ambient', 'direct_message', 'file_share'], (bot, message) => {
   })
 })
 
-controller.hears('add_user', ['ambient'], (bot, message) => {
-  bot.api.users.info({ user: message.user }, (err, res) => {
-    const newUser = new User({
-      id: res.user.id,
-      username: res.user.name,
-      firstName: res.user.profile.first_name,
-      lastName: res.user.profile.last_name,
+/*
+ * Adds all users into the database
+ */
+controller.hears('add_all_users', ['ambient', 'direct_message'], (bot, message) => {
+  bot.api.users.list({}, (err, res) => {
+    if (err) return err
+    res.members.forEach(member => {
+      // only takes users that have a first and last name
+      if (member.profile.first_name && member.profile.last_name) {
+        createUser(member)
+      }
     })
-    newUser.save((err, response) => {
-      if (err) return err
-      bot.reply(message, `Added ${res.user.name} to the database`)
-    })
+  })
+})
+
+/*
+ * Adds a specified user
+ */
+controller.hears('add_user', ['direct_message'], (bot, message) => {
+  const newUser = message.text.split(/[ <>@]/).filter(item => item.length > 0)[0]
+  bot.api.users.info({ user: newUser }, (err, res) => {
+    createUser(res.user)
+    console.log('success')
   })
 })
 
