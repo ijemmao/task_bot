@@ -3,6 +3,9 @@ import schedule from 'node-schedule'
 import data from '../mock_data/milestones' 
 import moment from 'moment'
 import * as markdown from './markdown.js' 
+import * as db from './db'
+
+let channelMessages = []
 
 // botkit controller
 const controller = botkit.slackbot({
