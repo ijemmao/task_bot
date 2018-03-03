@@ -95,7 +95,7 @@ if (moment().isSameOrAfter(startDate) && moment().isSameOrBefore(endDate) && cur
 */
 function getMilestone(week) {
   var raw_milestone = data[week] // pulls raw milestone
-  var milestone = '_It\'s milestone time!_\n\n' 
+  var milestone = '@channel _It\'s milestone time!_\n\n' 
 
   // adds weekly milestone title and week #
   milestone += '*Week ' + raw_milestone['milestone'] + ':* ' + (raw_milestone['title'] + '\n')
