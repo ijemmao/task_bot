@@ -13,7 +13,7 @@ let channelMessages = []
 
 // initialize slackbot
 const slackbot = controller.spawn({
-  token: process.env.SLACK_BOT_TOKEN,
+  token: process.env.TASK_BOT_TOKEN,
   // this grabs the slack token we exported earlier
 }).startRTM(err => {
   // start the real time message client
@@ -75,18 +75,18 @@ rule.minute = 0
 rule.second = 0 
 
 // if the current date is within the start and end date range
-if (moment().isSameOrAfter(startDate) && moment().isSameOrBefore(endDate) && currentWeek <= 8) {
+if (moment().range(startDate, endDate) && currentWeek <= 8) {
   
   // post milestones message in each channel in channels list if it's the corresponding time
   var milestones = schedule.scheduleJob(rule, function(){
-    for (var i = 0; i < channels.length;  i++) {
+    channels.forEach(function(channel) {
       slackbot.say( {
         text: getMilestone(currentWeek),
-        channel: channels[i]
+        channel: channel
       }) 
-    }
-    currentWeek++
-  }) 
+    })
+    currentWeek += 1
+  })
 }
 
 /*
