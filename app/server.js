@@ -78,9 +78,9 @@ rule.second = 0
 if (moment().range(startDate, endDate) && currentWeek <= 8) {
   
   // post milestones message in each channel in channels list if it's the corresponding time
-  var milestones = schedule.scheduleJob(rule, function(){
-    channels.forEach(function(channel) {
-      slackbot.say( {
+  schedule.scheduleJob(rule => {
+    channels.forEach(channel => {
+      slackbot.say({
         text: getMilestone(currentWeek),
         channel: channel
       }) 
@@ -93,7 +93,7 @@ if (moment().range(startDate, endDate) && currentWeek <= 8) {
 * getMilestone() takes in the current week number and gets and formats the milestone for
 * that week.
 */
-function getMilestone(week) {
+let getMilestone = (week) => {
   var raw_milestone = data[week] // pulls raw milestone
   var milestone = '@channel _It\'s milestone time!_\n\n' 
 

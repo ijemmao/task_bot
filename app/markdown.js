@@ -10,7 +10,7 @@
 * Takes a given header, makes it bold, all uppercase, and adds a
 * newline character at the ned of it.
 */
-function formatHeader(key) {
+let formatHeader = (key) => {
     return ('\n*' + key.toUpperCase() + '*:\n');
 }
 
@@ -18,7 +18,7 @@ function formatHeader(key) {
 * Format items in a dictionary into a bullet list format where each
 * line is tabbed.
 */
-function formatLists(dict) {
+let formatLists = (dict) => {
     var result = "";
 
     for (var item in dict) {
