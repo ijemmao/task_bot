@@ -1,10 +1,9 @@
 import botkit from 'botkit'
 import schedule from 'node-schedule'
-import data from '../mock_data/milestones' 
+import data from '../mock_data/milestones'
 import moment from 'moment'
-import * as markdown from './markdown.js' 
+import * as markdown from './markdown.js'
 import * as db from './db'
-import User from './../models/user'
 import { createUser } from './../db-actions/user-actions'
 
 let channelMessages = []
@@ -84,7 +83,7 @@ controller.hears(['show'], ['direct_message'], (bot, message) => {
   console.log(channelMessages)
 })
 
-/************************* milestones *************************/
+// ---------------------- milestones ---------------------- //
 
 /*
 * getMilestone() takes in the current week number and gets and formats the milestone for
@@ -100,7 +99,7 @@ const getMilestone = (week) => {
   // formats each section of the milestone in markdown format
   for (const section in rawMilestone) {
     if (section != 'milestone' && section != 'title') {
-      milestone += markdown.formatHeader(section) 
+      milestone += markdown.formatHeader(section)
       if (typeof rawMilestone[section] === typeof new Object()) {
         milestone += markdown.formatLists(rawMilestone[section])
       } else {
