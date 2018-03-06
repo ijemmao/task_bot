@@ -4,7 +4,7 @@ import data from '../mock_data/milestones'
 import moment from 'moment'
 import * as markdown from './markdown.js'
 import * as db from './db'
-import { createUser } from './../db-actions/user-actions'
+import { createUser } from './db-actions/user-actions'
 
 let channelMessages = []
 
