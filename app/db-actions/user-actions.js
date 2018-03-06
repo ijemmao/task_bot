@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import User from './../models/user'
 
 export function createUser(data) {
@@ -6,4 +7,14 @@ export function createUser(data) {
   newUser.save((err, res) => {
     if (err) return err
   })
+}
+
+export function getDALIUsers() {
+  console.log('grabbing all the users from the DALI-API')
+  fetch('http://localhost:3000/api/users', {
+    method: 'GET',
+    headers: { Authorization: process.env.TASK_BOT_AUTH },
+  })
+  .then(res => res.text())
+  .then(body => console.log(body))
 }

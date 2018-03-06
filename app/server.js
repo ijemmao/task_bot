@@ -4,7 +4,7 @@ import data from '../mock_data/milestones'
 import moment from 'moment'
 import * as markdown from './markdown.js'
 import * as db from './db'
-import { createUser } from './db-actions/user-actions'
+import { createUser, getDALIUsers } from './db-actions/user-actions'
 
 let channelMessages = []
 
@@ -66,6 +66,10 @@ controller.hears('add_all_users', ['direct_message'], (bot, message) => {
       }
     })
   })
+})
+
+controller.hears('reddit', ['direct_message'], (bot, message) => {
+  getDALIUsers()
 })
 
 /*
