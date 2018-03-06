@@ -24,6 +24,8 @@ const slackbot = controller.spawn({
   }
 })
 
+console.log('Task Bot is up and running!')
+
 // prepare webhook
 controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
   controller.createWebhookEndpoints(webserver, slackbot, () => {
