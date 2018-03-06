@@ -35,6 +35,30 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
   })
 })
 
+// ------------------ channel information ----------------- //
+
+/*
+ * Listens for command that will provide channel history
+ * This will give list of messages
+ */
+controller.hears('channel_info', ['direct_mention'], (bot, message) => {
+  bot.api.channels.history({ channel: message.channel }, (err, res) => {
+    if (err) return err
+    const messageCount = res.messages.length
+    let channelFreq = {}
+    res.messages.forEach(resMessage => {
+      if (!channelFreq[resMessage.user]) {
+        channelFreq[resMessage.user] = { messageCount, history: [] }
+        console.log(resMessage.ts)
+        channelFreq[resMessage.user].history.push({ ts: resMessage.ts, text: resMessage.text })
+      }
+    })
+    console.log(channelFreq)
+  })
+})
+
+// ---------------------- listening ----------------------- //
+
 /*
  * Listens for any comment from any channel
  * Uses data structure that keeps track of each channel
@@ -54,6 +78,8 @@ controller.on(['ambient', 'direct_message', 'file_share'], (bot, message) => {
     }
   })
 })
+
+// ---------------------- add users ----------------------- //
 
 /*
  * Adds all users into the database
@@ -92,6 +118,8 @@ controller.hears('add_user', ['direct_message'], (bot, message) => {
     console.log('success')
   })
 })
+
+// ---------------------- debugging ----------------------- //
 
 controller.hears(['show'], ['direct_message'], (bot, message) => {
   console.log(channelMessages)
