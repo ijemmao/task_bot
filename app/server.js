@@ -68,8 +68,16 @@ controller.hears('add_all_users', ['direct_message'], (bot, message) => {
   })
 })
 
-controller.hears('reddit', ['direct_message'], (bot, message) => {
+
+/*
+ * Grabs all users from DALI-API
+ */
+controller.hears('get_dali_users', ['direct_message'], (bot, message) => {
   getDALIUsers()
+  .then(res => { return res.json() })
+  .then(json => {
+    bot.reply(message, 'Grabbed all users from DALI-API')
+  })
 })
 
 /*
