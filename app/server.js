@@ -36,22 +36,38 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 // ------------------ channel information ----------------- //
 
 /*
- * Listens for command that will provide channel history
- * This will give list of messages
+ * Listens for command that will provide channel activity in the past week
+ * With provided data, this function will decide whether or not this channel
+ * is active
  */
-controller.hears('channel_info', ['direct_mention'], (bot, message) => {
-  bot.api.channels.history({ channel: message.channel }, (err, res) => {
+controller.hears('channels_activity', ['direct_message'], (bot, message) => {
+
+  // Unix timestamp of last week
+  const lastWeekUnix = moment().subtract(1, 'weeks').endOf('isoWeek').unix()
+  const twoWeeksUnix = moment().subtract(2, 'weeks').endOf('isoWeek').unix()
+
+  bot.api.channels.list({}, (err, res) => {
     if (err) return err
-    const messageCount = res.messages.length
-    let channelFreq = {}
-    res.messages.forEach(resMessage => {
-      if (!channelFreq[resMessage.user]) {
-        channelFreq[resMessage.user] = { messageCount, history: [] }
-        console.log(resMessage.ts)
-        channelFreq[resMessage.user].history.push({ ts: resMessage.ts, text: resMessage.text })
-      }
+    const memberChannels = res.channels.filter(item => item.is_member)
+    // console.log(memberChannels)
+
+    let channelMessages = {}
+
+    const tasks = memberChannels.map(channel => {
+      return new Promise((resolve, reject) => {
+        bot.api.channels.history({ channel: channel.id, oldest: twoWeeksUnix }, (err1, res1) => {
+          if (err1) reject(err1)
+          resolve(res1.messages)
+        })
+      })
+      .catch(e => {
+        console.log(e)
+      })
     })
-    console.log(channelFreq)
+
+    Promise.all(tasks).then(values => {
+      channelMessages = values
+    })
   })
 })
 
