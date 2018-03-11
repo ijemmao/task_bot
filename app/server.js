@@ -44,18 +44,16 @@ controller.hears('channels_activity', ['direct_message'], (bot, message) => {
 
   // Unix timestamp of last week
   const lastWeekUnix = moment().subtract(1, 'weeks').endOf('isoWeek').unix()
-  const twoWeeksUnix = moment().subtract(2, 'weeks').endOf('isoWeek').unix()
 
   bot.api.channels.list({}, (err, res) => {
     if (err) return err
     const memberChannels = res.channels.filter(item => item.is_member)
-    // console.log(memberChannels)
 
     let channelMessages = {}
 
     const tasks = memberChannels.map(channel => {
       return new Promise((resolve, reject) => {
-        bot.api.channels.history({ channel: channel.id, oldest: twoWeeksUnix }, (err1, res1) => {
+        bot.api.channels.history({ channel: channel.id, oldest: lastWeekUnix }, (err1, res1) => {
           if (err1) reject(err1)
           resolve(res1.messages)
         })
