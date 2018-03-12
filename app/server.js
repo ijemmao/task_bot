@@ -35,25 +35,33 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 
 // ------------------ channel information ----------------- //
 
-const sortProductiveChannels = (channels) => {
-
-}
-
 const productivityScore = (channelInfo) => {
   const dayInSeconds = 86400
   const numMessages = channelInfo.length
   let responseScore = 0
-  channelInfo.forEach((message, index) => {
-    if (index > 0) {
-      const messageTimeDifference = channelInfo[index] - channelInfo[index - 1]
-      if (messageTimeDifference <= dayInSeconds) {
-        responseScore += 3
-      } else {
-        responseScore -= 1
+  if (numMessages > 8) {
+    channelInfo.forEach((message, index) => {
+      if (index > 0) {
+        const messageTimeDifference = channelInfo[index] - channelInfo[index - 1]
+        if (messageTimeDifference <= dayInSeconds) {
+          responseScore += 3
+        } else {
+          responseScore -= 1
+        }
       }
-    }
-  })
+    })
+  } else {
+    responseScore = -100000
+  }
   return numMessages + responseScore
+}
+
+
+const sortProductiveChannels = (channels) => {
+  channels.sort((a, b) => {
+    return productivityScore(b) - productivityScore(a)
+  })
+  return channels
 }
 
 /*
@@ -86,6 +94,7 @@ controller.hears('channels_activity', ['direct_message'], (bot, message) => {
 
     Promise.all(tasks).then(values => {
       channelMessages = values
+      console.log(sortProductiveChannels(channelMessages))
     })
   })
 })
