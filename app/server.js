@@ -37,6 +37,12 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 
 // ------------------ channel information ----------------- //
 
+/*
+ * Returns a productivity score for each provided channel
+ * Current favors channels that have response times below
+ * a day
+ */
+
 const productivityScore = (channelInfo) => {
   const dayInSeconds = 86400
   const numMessages = channelInfo.messages.length
@@ -76,13 +82,20 @@ const sortProductiveChannels = (channels) => {
  * Based on given threshold, returns a list of channels
  * that need a poke to drive up productivity
  */
-const pokeChannels = (channels, threshold) => {
+const getPokeChannels = (channels, threshold) => {
   const scoredChannels = sortProductiveChannels(channels)
   const firstChannel = scoredChannels[0]
-  const pokeChannels = scoredChannels.filter(channel => channel.score < (firstChannel.score * threshold).toFixed(2)).map(channel => channel.channel.id)
+  const pokeChannelsRaw = scoredChannels.filter(channel => channel.score < (firstChannel.score * threshold).toFixed(2))
+  const pokeChannels = pokeChannelsRaw.map(channel => channel.channel.id)
   return pokeChannels
 }
 
+const pokeChannels = (bot, channels) => {
+  channels.forEach(id => {
+    bot.api.chat.postMessage({ channel: id, text: 'Low productivity poke test' }, (err, res) => {
+    })
+  })
+}
 /*
  * Listens for command that will provide channel activity in the past week
  * With provided data, this function will decide whether or not this channel
@@ -113,7 +126,8 @@ controller.hears('channels_activity', ['direct_message'], (bot, message) => {
 
     Promise.all(tasks).then(values => {
       channelMessages = values
-      console.log(pokeChannels(values, 0.5))
+      const channelsToPoke = getPokeChannels(values, 0.5)
+      pokeChannels(bot, channelsToPoke)
     })
   })
 })
