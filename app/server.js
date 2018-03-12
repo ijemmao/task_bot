@@ -37,12 +37,12 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 
 const productivityScore = (channelInfo) => {
   const dayInSeconds = 86400
-  const numMessages = channelInfo.length
+  const numMessages = channelInfo.messages.length
   let responseScore = 0
   if (numMessages > 8) {
-    channelInfo.forEach((message, index) => {
+    channelInfo.messages.forEach((message, index) => {
       if (index > 0) {
-        const messageTimeDifference = channelInfo[index] - channelInfo[index - 1]
+        const messageTimeDifference = channelInfo.messages[index] - channelInfo.messages[index - 1]
         if (messageTimeDifference <= dayInSeconds) {
           responseScore += 3
         } else {
@@ -65,7 +65,7 @@ const sortProductiveChannels = (channels) => {
     return { channel, score: productivityScore(channel) }
   })
   scoredChannels.sort((a, b) => {
-    return productivityScore(b) - productivityScore(a)
+    return productivityScore(b.channel) - productivityScore(a.channel)
   })
   return scoredChannels
 }
@@ -77,7 +77,7 @@ const sortProductiveChannels = (channels) => {
 const pokeChannels = (channels, threshold) => {
   const scoredChannels = sortProductiveChannels(channels)
   const firstChannel = scoredChannels[0]
-  const pokeChannels = scoredChannels.filter(channel => channel.score < (firstChannel.score * threshold).toFixed(2))
+  const pokeChannels = scoredChannels.filter(channel => channel.score < (firstChannel.score * threshold).toFixed(2)).map(channel => channel.channel.id)
   return pokeChannels
 }
 
@@ -101,7 +101,7 @@ controller.hears('channels_activity', ['direct_message'], (bot, message) => {
       return new Promise((resolve, reject) => {
         bot.api.channels.history({ channel: channel.id, oldest: lastWeekUnix }, (err1, res1) => {
           if (err1) reject(err1)
-          resolve(res1.messages)
+          resolve({ id: channel.id, messages: res1.messages })
         })
       })
       .catch(e => {
