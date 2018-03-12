@@ -58,12 +58,29 @@ const productivityScore = (channelInfo) => {
   return numMessages + responseScore
 }
 
-
+/*
+ * Sorts channels based on assigned productivity score
+ * Transforms original channels list to hold associated score
+ */
 const sortProductiveChannels = (channels) => {
-  channels.sort((a, b) => {
+  const scoredChannels = channels.map(channel => {
+    return { channel, score: productivityScore(channel) }
+  })
+  scoredChannels.sort((a, b) => {
     return productivityScore(b) - productivityScore(a)
   })
-  return channels
+  return scoredChannels
+}
+
+/*
+ * Based on given threshold, returns a list of channels
+ * that need a poke to drive up productivity
+ */
+const pokeChannels = (channels, threshold) => {
+  const scoredChannels = sortProductiveChannels(channels)
+  const firstChannel = scoredChannels[0]
+  const pokeChannels = scoredChannels.filter(channel => channel.score < (firstChannel.score * threshold).toFixed(2))
+  return pokeChannels
 }
 
 /*
@@ -96,7 +113,7 @@ controller.hears('channels_activity', ['direct_message'], (bot, message) => {
 
     Promise.all(tasks).then(values => {
       channelMessages = values
-      console.log(sortProductiveChannels(channelMessages))
+      console.log(pokeChannels(values, 0.5))
     })
   })
 })
