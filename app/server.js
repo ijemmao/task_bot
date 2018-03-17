@@ -9,6 +9,9 @@ import { getMilestone } from './data-actions/milestones'
 let currentWeek = 0
 let onTerm = false
 
+/*
+ * Shifts the provided date to the first Wednesday
+ */
 const shiftToWednesday = (termStartDate) => {
   while (termStartDate.format('dddd') !== 'Wednesday') {
     termStartDate.add(1, 'days')
@@ -19,43 +22,51 @@ const shiftToWednesday = (termStartDate) => {
 // winter
 const firstWeekWinter = moment().week(1)
 let firstDayWinter = firstWeekWinter.add(3 - firstWeekWinter.get('date'), 'days')
-const lastWeekWinter = moment().week(10)
+let lastDayWinter = moment()
 while (firstDayWinter.format('dddd') !== 'Monday' && firstDayWinter.format('dddd') !== 'Wednesday') {
   firstDayWinter.add(1, 'days')
 }
 firstDayWinter = shiftToWednesday(firstDayWinter)
-console.log(firstDayWinter)
-// console.log(lastWeekWinter)
+lastDayWinter = firstDayWinter.add(10, 'weeks')
+console.log(`First day of winter term: ${firstDayWinter}`)
+console.log(`Last day of winter term: ${lastDayWinter}`)
 
 // spring
 const firstWeekSpring = moment().week(12)
 let firstDaySpring = firstWeekSpring
+let lastDaySpring = moment()
 while (firstDaySpring.format('dddd') !== 'Monday') {
   firstDaySpring.add(1, 'days')
 }
 firstDaySpring = shiftToWednesday(firstDaySpring)
-console.log(firstDaySpring)
-// console.log(moment().week(22))
+lastDaySpring = firstDaySpring.add(10, 'weeks')
+console.log(`First day of spring term: ${firstDaySpring}`)
+console.log(`Last day of winter term: ${lastDaySpring}`)
 
 // summer
 const firstWeekSummer = moment().week(24)
 let firstDaySummer = firstWeekSummer
+let lastDaySummer = moment()
 while (firstDaySummer.format('dddd') !== 'Thursday') {
   firstDaySummer.add(1, 'days')
 }
 firstDaySummer = shiftToWednesday(firstDaySummer)
-console.log(firstDaySummer)
-// console.log(moment().week(34))
+lastDaySummer = firstDaySummer.add(10, 'weeks')
+console.log(`First day of summer term: ${firstDaySummer}`)
+console.log(`Last day of summer term: ${lastDaySummer}`)
 
 // fall
 const firstWeekFall = moment().week(36)
 let firstDayFall = firstWeekFall
+let lastDayFall = moment()
 while ((firstDayFall.format('dddd') !== 'Monday' && firstDayFall.format('dddd') !== 'Wednesday') || firstDayFall.get('date') < 11) {
   firstDayFall.add(1, 'days')
 }
 firstDayFall = shiftToWednesday(firstDayFall)
-console.log(firstDayFall)
-// console.log(moment().week(46))
+lastDayFall = firstDayFall.add(10, 'weeks')
+console.log(`First day of summer term: ${firstDayFall}`)
+console.log(`Last day of summer term: ${lastDayFall}`)
+
 // botkit controller
 const controller = botkit.slackbot({
   debug: false,
