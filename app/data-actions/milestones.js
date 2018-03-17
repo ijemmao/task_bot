@@ -11,7 +11,7 @@ const shiftToWednesday = (termStartDate) => {
   return termStartDate
 }
 
-// winter
+// Winter term ranges
 const firstWeekWinter = moment().week(1)
 let firstDayWinter = firstWeekWinter.add(3 - firstWeekWinter.get('date'), 'days')
 let lastDayWinter = moment()
@@ -23,7 +23,7 @@ lastDayWinter = firstDayWinter.add(10, 'weeks')
 console.log(`First day of winter term: ${firstDayWinter}`)
 console.log(`Last day of winter term: ${lastDayWinter}`)
 
-// spring
+// Spring term ranges
 const firstWeekSpring = moment().week(12)
 let firstDaySpring = firstWeekSpring
 let lastDaySpring = moment()
@@ -35,7 +35,7 @@ lastDaySpring = firstDaySpring.add(10, 'weeks')
 console.log(`First day of spring term: ${firstDaySpring}`)
 console.log(`Last day of winter term: ${lastDaySpring}`)
 
-// summer
+// Summer term ranges
 const firstWeekSummer = moment().week(24)
 let firstDaySummer = firstWeekSummer
 let lastDaySummer = moment()
@@ -47,7 +47,7 @@ lastDaySummer = firstDaySummer.add(10, 'weeks')
 console.log(`First day of summer term: ${firstDaySummer}`)
 console.log(`Last day of summer term: ${lastDaySummer}`)
 
-// fall
+// Fall term ranges
 const firstWeekFall = moment().week(36)
 let firstDayFall = firstWeekFall
 let lastDayFall = moment()
