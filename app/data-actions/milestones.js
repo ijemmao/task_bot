@@ -1,8 +1,5 @@
 import moment from 'moment'
-import schedule from 'node-schedule'
 import data from './../../mock_data/milestones'
-
-export let onTerm = false
 
 /*
  * Shifts the provided date to the first Wednesday
@@ -80,18 +77,6 @@ export const checkOnTerm = () => {
   })
   return false
 }
-
-// Checks daily at 12AM to see if term start/end dates are correct
-const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
-  console.log('Updating the expected term bounds are correct')
-
-  // We are not in a term and we haven't confirmed correct term start/end dates
-  /*
-   * TODO: Check with admin to make sure that currently assigned
-   * start/end dates are correct
-   */
-  onTerm = checkOnTerm()
-})
 
 /*
  * Takes a given header, makes it bold, all uppercase, and adds a

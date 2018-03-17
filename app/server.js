@@ -3,10 +3,10 @@ import schedule from 'node-schedule'
 import moment from 'moment'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { checkChannelActivity } from './data-actions/automate-tasks'
-import { getMilestone, onTerm } from './data-actions/milestones'
+import { getMilestone, checkOnTerm } from './data-actions/milestones'
 
 let currentWeek = 0
+let onTerm = false
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -157,4 +157,16 @@ const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0,
     // reset the week counter
     if (currentWeek === 10) currentWeek = 0
   })
+})
+
+// Checks daily at 12AM to see if term start/end dates are correct
+const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
+  console.log('Updating the expected term bounds are correct')
+
+  // We are not in a term and we haven't confirmed correct term start/end dates
+  /*
+   * TODO: Check with admin to make sure that currently assigned
+   * start/end dates are correct
+   */
+  onTerm = checkOnTerm()
 })
