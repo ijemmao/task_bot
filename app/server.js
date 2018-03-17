@@ -1,13 +1,13 @@
 import botkit from 'botkit'
 import schedule from 'node-schedule'
 import moment from 'moment'
-import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { getMilestone, checkOnTerm, daysBeforeStart} from './data-actions/milestones'
+import { getMilestone, checkOnTerm, daysBeforeStart } from './data-actions/milestones'
+import { confirmChannels, addChannel, removeChannel, populateChannels } from './data-actions/confirm-information'
 
 let currentWeek = 0
 let onTerm = false
-let confirmingDates = false
+let updatingChannels = false
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -45,7 +45,6 @@ controller.on('poke_channels_activity', (bot) => {
 
   // Unix timestamp of last week
   const lastWeekUnix = moment().subtract(1, 'weeks').endOf('isoWeek').unix()
-  
 
   bot.api.channels.list({}, (err, res) => {
     if (err) return err
@@ -90,45 +89,33 @@ controller.on('send_milestones', (bot, week) => {
   })
 })
 
-// ---------------------- add users ----------------------- //
+// ------------------ updates channels ------------------- //
 
-/*
- * Adds all users into the database
- */
-controller.hears('add_all_users', ['direct_message'], (bot, message) => {
-  bot.api.users.list({}, (err, res) => {
-    if (err) return err
-    res.members.forEach(member => {
-      // only takes users that have a first and last name
-      if (member.profile.first_name && member.profile.last_name) {
-        createUser(member)
-      }
+controller.hears('add', ['direct_message'], (bot, message) => {
+  if (updatingChannels) {
+    const channelName = message.text.split(' ')[1]
+    const channelReferences = channelName.split(/[<|#>]/).filter(item => item.length > 0)
+
+    addChannel(bot, channelReferences)
+    .then(response => {
+      bot.reply(message, response)
     })
-  })
+  }
 })
 
+controller.hears('remove', ['direct_message'], (bot, message) => {
+  if (updatingChannels) {
+    const channelName = message.text.split(' ')[1]
+    const channelReferences = channelName.splot(/[<|#>]/).filter(item => item.length > 0)
 
-/*
- * Grabs all users from DALI-API
- */
-controller.hears('get_dali_users', ['direct_message'], (bot, message) => {
-  getDALIUsers()
-  .then(res => { return res.json() })
-  .then(json => {
-    bot.reply(message, 'Grabbed all users from DALI-API')
-  })
+    // removeChannel(bot, channelReferences)
+    // .then(response => {
+    //   bot.reply(message, response)
+    // })
+    // bot.reply(message, removeChannel(`#${channelReferences[1]}`))
+  }
 })
 
-/*
- * Adds a specified user
- */
-controller.hears('add_user', ['direct_message'], (bot, message) => {
-  const newUser = message.text.split(/[ <>@]/).filter(item => item.length > 0)[1]
-  bot.api.users.info({ user: newUser }, (err, res) => {
-    createUser(res.user)
-    console.log('success')
-  })
-})
 
 // ------------------- automated tasks ------------------- //
 
@@ -169,40 +156,42 @@ const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 },
 })
 
 // Grabs users that have already spoken to the task bot
-slackbot.startRTM((err, bot) => {
-  if (err) throw new Error(err)
+// slackbot.startRTM((err, bot) => {
+//   if (err) throw new Error(err)
 
-  bot.api.im.list({}, (error, res) => {
-    const imChannels = res.ims
-    const userPromises = imChannels.map(im => {
-      return new Promise((resolve, reject) => {
-        bot.api.users.info({ user: im.user }, (err1, res1) => {
-          if (err1) reject(err1)
-          resolve({ user: res1.user, im })
-        })
-      })
-      .catch(e => {
-        console.log(e)
-      })
-    })
-    Promise.all(userPromises).then(values => {
-      const adminUsers = values.filter(item => {
-        return item.user.real_name === 'Ijemma Onwuzulike'
-      })
-      return adminUsers
-    })
-    .then(adminUsers => {
-      console.log(adminUsers)
-      bot.api.chat.postMessage({ channel: 'D9G8BAN8L', text: 'Gotta confirm a couple of things' }, (err2, res2) => {
-        confirmingDates = true
-      })
-    })
-  })
-
-  // bot.api.conversations.create({ name: 'Ijemma Onwuzulike', is_private: true }, (err, res) => {
-  //   bot.api.chat.postMessage({ channel: 'Ijemma Onwuzulike', text: 'starting conversation' }, () => {})
-  // })
-})
+//   bot.api.im.list({}, (error, res) => {
+//     const imChannels = res.ims
+//     const userPromises = imChannels.map(im => {
+//       return new Promise((resolve, reject) => {
+//         bot.api.users.info({ user: im.user }, (err1, res1) => {
+//           if (err1) reject(err1)
+//           resolve({ user: res1.user, im })
+//         })
+//       })
+//       .catch(e => {
+//         console.log(e)
+//       })
+//     })
+//     Promise.all(userPromises).then(values => {
+//       const adminUsers = values.filter(item => {
+//         return item.user.real_name === 'Ijemma Onwuzulike'
+//       })
+//       return adminUsers
+//     })
+//     .then(adminUsers => {
+//       bot.api.chat.postMessage({ channel: 'D9G8BAN8L', text: 'confirmChannels' }, (err2, res2) => {
+//         if (err2) return err2
+//         updatingChannels = true
+//         // populateChannels(bot)
+//         // .then(currentlyTrackedChannels => {
+//         //   console.log(currentlyTrackedChannels)
+//         //   addChannel('#task-bot-test3')
+//         //   console.log(confirmChannels.channels)
+//         // })
+//       })
+//     })
+//   })
+// })
 
 // const updateChannelsList = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
 //   if (!onTerm && daysBeforeStart() < 4) {
