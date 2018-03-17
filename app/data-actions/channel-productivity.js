@@ -44,24 +44,16 @@ const sortProductiveChannels = (channels) => {
  * Generates a unique message for each channel
  * that will get poked
  */
-
-const generateChannelMessage = (bot, id) => {
+const generateChannelMessage = (res) => {
   let message = ''
-  bot.api.channels.info({ channel: id }, (err, res) => {
-    if (err) return err
-    message += `Hey ${res.channel.name}!\n`
-    message += 'Just wanted to jump inside this channel to remind you all to give communication high!\n'
-    message += 'There are a number of ways to make sure that your channel is active:\n\n'
-    message += '\t• Ask questions about development or design\n'
-    message += '\t• Drop images of code or design for some quick feedback\n'
-    message += '\t• Provide small updates about general work\n'
-    message += '\t• Share some spicy memes, it never hurts!\n'
-    const daysDifference = moment().diff(moment().unix(res.channel.latest.ts), 'days')
-    if (daysDifference > 2) {
-      message += `The channels last message was sent ${daysDifference} days ago!`
-    }
-    return message
-  })
+  message += `Hey <!channel>!\n`
+  message += 'After looking at general activity in the lab, I noticed that your activity this past week has been lower than usual\n'
+  message += 'There are a number of ways to make sure that your channel is active:\n\n'
+  message += '\t• Ask questions about development or design\n'
+  message += '\t• Drop images of code or design for some quick feedback\n'
+  message += '\t• Provide small updates about general work\n'
+  message += '\t• Share some spicy memes, it never hurts!\n'
+  return message
 }
 
 /*
@@ -79,15 +71,9 @@ export const getPokeChannels = (channels, threshold) => {
 export const pokeChannels = (bot, channels) => {
   channels.forEach(id => {
     bot.api.channels.info({ channel: id }, (err, res) => {
-      let message = ''
       if (err) return err
-      message += `Hey @channel!\n`
-      message += 'After looking at general activity in the lab, I noticed that your activity this past week has been lower than usual\n'
-      message += 'There are a number of ways to make sure that your channel is active:\n\n'
-      message += '\t• Ask questions about development or design\n'
-      message += '\t• Drop images of code or design for some quick feedback\n'
-      message += '\t• Provide small updates about general work\n'
-      message += '\t• Share some spicy memes, it never hurts!\n'
+
+      const message = generateChannelMessage()
       bot.api.chat.postMessage({ channel: id, text: message }, (err, res) => {})
     })
   })
