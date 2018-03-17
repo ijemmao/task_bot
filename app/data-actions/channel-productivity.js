@@ -1,3 +1,4 @@
+import moment from 'moment'
 /*
  * Returns a productivity score for each provided channel
  * Current favors channels that have response times below
@@ -40,6 +41,22 @@ const sortProductiveChannels = (channels) => {
 }
 
 /*
+ * Generates a unique message for each channel
+ * that will get poked
+ */
+const generateChannelMessage = (res) => {
+  let message = ''
+  message += `Hey <!channel>!\n`
+  message += 'After analyzing Slack activity in the lab, I noticed that your channel has slightly lower activity marks\n'
+  message += 'No worries, there are a number of ways to make sure that your channel is active:\n\n'
+  message += '\t• Ask questions about development or design\n'
+  message += '\t• Drop images of code or design for some quick feedback\n'
+  message += '\t• Provide small updates about general work\n'
+  message += '\t• Share some spicy memes, it never hurts!\n'
+  return message
+}
+
+/*
  * Based on given threshold, returns a list of channels
  * that need a poke to drive up productivity
  */
@@ -53,7 +70,11 @@ export const getPokeChannels = (channels, threshold) => {
 
 export const pokeChannels = (bot, channels) => {
   channels.forEach(id => {
-    bot.api.chat.postMessage({ channel: id, text: 'Low productivity poke test' }, (err, res) => {
+    bot.api.channels.info({ channel: id }, (err, res) => {
+      if (err) return err
+
+      const message = generateChannelMessage()
+      bot.api.chat.postMessage({ channel: id, text: message }, (err, res) => {})
     })
   })
 }

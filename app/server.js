@@ -116,7 +116,7 @@ controller.hears('add_user', ['direct_message'], (bot, message) => {
 // ------------------- automated tasks ------------------- //
 
 // Slacks out channel productivity every Saturday at 10AM
-const channelActivityReminder = schedule.scheduleJob({ hour: 19, minute: 16, second: 15, dayOfWeek: 5 }, () => {
+const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 6 }, () => {
   console.log('Reminding all channels that there are milestones to complete')
 
   slackbot.startRTM((err, bot) => {
