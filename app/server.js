@@ -1,12 +1,12 @@
 import botkit from 'botkit'
 import schedule from 'node-schedule'
-import data from '../mock_data/milestones'
 import moment from 'moment'
-import * as markdown from './markdown.js'
-import * as db from './db'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { checkChannelActivity } from './data-actions/automate-tasks'
+import { getMilestone, checkOnTerm } from './data-actions/milestones'
+
+let currentWeek = 0
+let onTerm = false
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -34,7 +34,7 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
   })
 })
 
-// ------------------ channel information ----------------- //
+// ------------------ send informational blurbs ----------------- //
 /*
  * Listens for command that will provide channel activity in the past week
  * With provided data, this function will decide whether or not this channel
@@ -69,6 +69,22 @@ controller.on('poke_channels_activity', (bot) => {
       channelMessages = values
       const channelsToPoke = getPokeChannels(values, 0.3)
       pokeChannels(bot, channelsToPoke)
+    })
+  })
+})
+
+/*
+ * Listens for command that will send out milestone to each channel
+ * that is being tracked by the task bot
+ */
+controller.on('send_milestones', (bot, week) => {
+  bot.api.channels.list({}, (err, res) => {
+    if (err) return err
+    const memberChannels = res.channels.filter(item => item.is_member)
+
+    memberChannels.forEach(channel => {
+      const currentMilestone = getMilestone(week)
+      bot.api.postMessage({ channel: channel.id, text: currentMilestone }, (err, res) => {})
     })
   })
 })
@@ -123,7 +139,34 @@ const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, seco
     if (err) throw new Error(err)
 
     console.log('Poking channels that need better activity')
-
-    controller.trigger('poke_channels_activity', [bot])
+    if (onTerm) controller.trigger('poke_channels_activity', [bot])
   })
+})
+
+// Slacks out channels current milestones every Tuesday at 10AM
+const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 2 }, () => {
+  console.log('Sending out milestone reminder')
+  slackbot.startRTM((err, bot) => {
+    if (err) throw new Error(err)
+
+    console.log('Sending milestones if currently on a term')
+    if (onTerm) {
+      currentWeek += 1
+      if (onTerm) controller.trigger('send_milestones', [bot, currentWeek])
+    }
+    // reset the week counter
+    if (currentWeek === 10) currentWeek = 0
+  })
+})
+
+// Checks daily at 12AM to see if term start/end dates are correct
+const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
+  console.log('Updating the expected term bounds are correct')
+
+  // We are not in a term and we haven't confirmed correct term start/end dates
+  /*
+   * TODO: Check with admin to make sure that currently assigned
+   * start/end dates are correct
+   */
+  onTerm = checkOnTerm()
 })
