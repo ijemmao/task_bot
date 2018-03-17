@@ -1,10 +1,15 @@
+import moment from 'moment'
+import schedule from 'node-schedule'
+import * as markdown from './../markdown'
+import data from './../../mock_data/milestones'
+
 // ---------------------- milestones ---------------------- //
 
 /*
 * getMilestone() takes in the current week number and gets and formats the milestone for
 * that week.
 */
-const getMilestone = (week) => {
+export const getMilestone = (week) => {
   const rawMilestone = data[week] // pulls raw milestone
   let milestone = '@channel _It\'s milestone time!_\n\n'
 
@@ -29,8 +34,6 @@ const getMilestone = (week) => {
   return milestone
 }
 
-const channels = ['C9G17060H', 'C9G073P2N']   // dummy channel list
-
 // start and end dates for term and week count
 const startDate = moment('03/28/2018', 'MM/DD/YYYY')
 const endDate = moment('05/30/2018', 'MM/DD/YYYY')
@@ -43,10 +46,12 @@ rule.hour = 20
 rule.minute = 0
 rule.second = 0
 
-// if the current date is within the start and end date range
-// if (moment().range(startDate, endDate) && currentWeek <= 8) {
-//   // post milestones message in each channel in channels list if it's the corresponding time
-//   schedule.scheduleJob(r => {
+
+
+// // if the current date is within the start and end date range
+// if (moment().range(startDate, endDate) && currentWeek < 10) {
+//   // post milestones every Tuesday at 10AM
+//   schedule.scheduleJob({ hour: 10, dayOfWeek: 2 }, () => {
 //     channels.forEach(channel => {
 //       slackbot.say({
 //         text: getMilestone(currentWeek),
