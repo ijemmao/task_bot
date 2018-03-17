@@ -4,11 +4,9 @@ import moment from 'moment'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
 import { checkChannelActivity } from './data-actions/automate-tasks'
-import { getMilestone, checkOnTerm } from './data-actions/milestones'
+import { getMilestone, onTerm } from './data-actions/milestones'
 
 let currentWeek = 0
-let onTerm = false
-let checkTermBoundaries = false
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -141,7 +139,7 @@ const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, seco
     if (err) throw new Error(err)
 
     console.log('Poking channels that need better activity')
-    controller.trigger('poke_channels_activity', [bot])
+    if (onTerm) controller.trigger('poke_channels_activity', [bot])
   })
 })
 
@@ -154,25 +152,9 @@ const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0,
     console.log('Sending milestones if currently on a term')
     if (onTerm) {
       currentWeek += 1
-      controller.trigger('send_milestones', [bot, currentWeek])
+      if (onTerm) controller.trigger('send_milestones', [bot, currentWeek])
     }
     // reset the week counter
     if (currentWeek === 10) currentWeek = 0
   })
-})
-
-// Checks daily at 12AM to see if term start/end dates are correct
-const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
-  console.log('Updating the expected term bounds are correct')
-
-  // We are not in a term and we haven't confirmed correct term start/end dates
-  if (!checkTermBoundaries && !onTerm) {
-    /*
-     * TODO: Check with admin to make sure that currently assigned
-     * start/end dates are correct
-     */
-    onTerm = checkOnTerm()
-    if (onTerm) checkTermBoundaries = false
-    else checkTermBoundaries = true
-  }
 })
