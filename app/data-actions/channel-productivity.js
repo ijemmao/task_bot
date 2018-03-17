@@ -1,3 +1,4 @@
+import moment from 'moment'
 /*
  * Returns a productivity score for each provided channel
  * Current favors channels that have response times below
@@ -40,6 +41,30 @@ const sortProductiveChannels = (channels) => {
 }
 
 /*
+ * Generates a unique message for each channel
+ * that will get poked
+ */
+
+const generateChannelMessage = (bot, id) => {
+  let message = ''
+  bot.api.channels.info({ channel: id }, (err, res) => {
+    if (err) return err
+    message += `Hey ${res.channel.name}!\n`
+    message += 'I just wanted to jump inside this channel to remind you all to give communication high!\n'
+    message += 'There are a number of ways to make sure that your channel is active:\n\n'
+    message += '\t• Ask questions about development or design\n'
+    message += '\t• Drop images of code or design for some quick feedback\n'
+    message += '\t• Provide small updates about general work\n'
+    message += '\t• Share some spicy memes, it never hurts!\n'
+    const daysDifference = moment().diff(moment().unix(res.channel.latest.ts), 'days')
+    if (daysDifference > 2) {
+      message += 'The channels last message was sent ${daysDifference} days ago!'
+    }
+    return message
+  })
+}
+
+/*
  * Based on given threshold, returns a list of channels
  * that need a poke to drive up productivity
  */
@@ -53,7 +78,8 @@ export const getPokeChannels = (channels, threshold) => {
 
 export const pokeChannels = (bot, channels) => {
   channels.forEach(id => {
-    bot.api.chat.postMessage({ channel: id, text: 'Low productivity poke test' }, (err, res) => {
+    const channelMessage = generateChannelMessage(bot, id)
+    bot.api.chat.postMessage({ channel: id, text: channelMessage }, (err, res) => {
     })
   })
 }
