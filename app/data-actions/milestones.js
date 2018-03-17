@@ -138,7 +138,7 @@ export const daysBeforeStart = () => {
   let minDays = 10000
   startDates.forEach(startDate => {
     minDays = Math.min(minDays, Math.abs(moment().diff(startDate, 'days')))
-    console.log(moment(), startDate, minDays)
   })
-  return 3
+  console.log(`Min days before the next term starts: ${minDays}`)
+  return minDays
 }

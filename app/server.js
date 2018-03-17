@@ -167,15 +167,15 @@ const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 },
   onTerm = checkOnTerm()
 })
 
-daysBeforeStart()
+const updateChannelsList = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
+  if (!onTerm && daysBeforeStart() < 4) {
+    /*
+     * Send out to the following conversational body:
+     * - Update the Channels List
+     * - Confirm the start date of the term or first Wednesday
+     * meeting
+     * - Etc.
+     */
 
-// const updateChannelsList = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
-//   if (!onTerm && daysBeforeStart() < 4) {
-
-//   }
-// })
-
-/*
- * TODO: Check with admin to make sure that currently assigned
- * start/end dates are correct
- */
+  }
+})
