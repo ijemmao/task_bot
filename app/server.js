@@ -117,7 +117,7 @@ controller.hears('add_user', ['direct_message'], (bot, message) => {
 // ------------------- automated tasks ------------------- //
 
 // Slacks out channel productivity every Saturday at 10AM
-const channelActivityReminder = schedule.scheduleJob({ hour: 19, minute: 1, second: 25, dayOfWeek: 5 }, () => {
+const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 6 }, () => {
   console.log('Reminding all channels that there are milestones to complete')
 
 
@@ -134,11 +134,6 @@ const channelActivityReminder = schedule.scheduleJob({ hour: 19, minute: 1, seco
 
     controller.trigger('poke_channels_activity', [bot])
   })
-  // controller.spawn({ token: process.env.ASK_BOT_TOKEN }, (bot) => {
-  //   console.log('Poking channels that need better activity')
-
-  //   controller.trigger('poke_channels_activity', [bot])
-  // })
 })
 
 // if (moment().format('dddd') === 'Friday') {
