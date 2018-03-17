@@ -47,8 +47,8 @@ const sortProductiveChannels = (channels) => {
 const generateChannelMessage = (res) => {
   let message = ''
   message += `Hey <!channel>!\n`
-  message += 'After looking at general activity in the lab, I noticed that your activity this past week has been lower than usual\n'
-  message += 'There are a number of ways to make sure that your channel is active:\n\n'
+  message += 'After analyzing Slack activity in the lab, I noticed that your channel has slightly lower activity marks\n'
+  message += 'No worries, there are a number of ways to make sure that your channel is active:\n\n'
   message += '\t• Ask questions about development or design\n'
   message += '\t• Drop images of code or design for some quick feedback\n'
   message += '\t• Provide small updates about general work\n'
