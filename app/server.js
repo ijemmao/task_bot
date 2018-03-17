@@ -7,6 +7,7 @@ import { getMilestone, checkOnTerm, daysBeforeStart} from './data-actions/milest
 
 let currentWeek = 0
 let onTerm = false
+let confirmingDates = false
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -167,15 +168,57 @@ const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 },
   onTerm = checkOnTerm()
 })
 
-const updateChannelsList = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
-  if (!onTerm && daysBeforeStart() < 4) {
-    /*
-     * Send out to the following conversational body:
-     * - Update the Channels List
-     * - Confirm the start date of the term or first Wednesday
-     * meeting
-     * - Etc.
-     */
+// Grabs users that have already spoken to the task bot
+slackbot.startRTM((err, bot) => {
+  if (err) throw new Error(err)
 
-  }
+  bot.api.im.list({}, (error, res) => {
+    const imChannels = res.ims
+    const userPromises = imChannels.map(im => {
+      return new Promise((resolve, reject) => {
+        bot.api.users.info({ user: im.user }, (err1, res1) => {
+          if (err1) reject(err1)
+          resolve({ user: res1.user, im })
+        })
+      })
+      .catch(e => {
+        console.log(e)
+      })
+    })
+    Promise.all(userPromises).then(values => {
+      const adminUsers = values.filter(item => {
+        return item.user.real_name === 'Ijemma Onwuzulike'
+      })
+      return adminUsers
+    })
+    .then(adminUsers => {
+      console.log(adminUsers)
+      bot.api.chat.postMessage({ channel: 'D9G8BAN8L', text: 'Gotta confirm a couple of things' }, (err2, res2) => {
+        confirmingDates = true
+      })
+    })
+  })
+
+  // bot.api.conversations.create({ name: 'Ijemma Onwuzulike', is_private: true }, (err, res) => {
+  //   bot.api.chat.postMessage({ channel: 'Ijemma Onwuzulike', text: 'starting conversation' }, () => {})
+  // })
 })
+
+// const updateChannelsList = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
+//   if (!onTerm && daysBeforeStart() < 4) {
+//     /*
+//      * Send out to the following conversational body:
+//      * - Update the Channels List
+//      * - Confirm the start date of the term or first Wednesday
+//      * meeting
+//      * - Etc.
+//      */
+//     slackbot.startRTM((err, bot) => {
+//       if (err) throw new Error(err)
+
+//       bot.api.conversation.create({ name: 'Ijemma Onwuzulike', is_private: true }, (err, res) => {
+//         console.log('starting conversation')
+//       })
+//     })
+//   }
+// })
