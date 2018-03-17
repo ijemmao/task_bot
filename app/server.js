@@ -17,18 +17,19 @@ const controller = botkit.slackbot({
 const slackbot = controller.spawn({
   token: process.env.TASK_BOT_TOKEN,
   // this grabs the slack token we exported earlier
-}).startRTM(err => {
-  // start the real time message client
-  if (err) {
-    throw new Error(err)
-  }
 })
 
 console.log('Task Bot is up and running!')
 
 // prepare webhook
 controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
-  controller.createWebhookEndpoints(webserver, slackbot, () => {
+  const slackbotRTM = slackbot.startRTM(err => {
+    // start the real time message client
+    if (err) {
+      throw new Error(err)
+    }
+  })
+  controller.createWebhookEndpoints(webserver, slackbotRTM, () => {
     if (err) {
       throw new Error(err)
     }
@@ -120,23 +121,14 @@ controller.hears('add_user', ['direct_message'], (bot, message) => {
 const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 6 }, () => {
   console.log('Reminding all channels that there are milestones to complete')
 
-
-  controller.spawn({
-    token: process.env.TASK_BOT_TOKEN,
-    // this grabs the slack token we exported earlier
-  }).startRTM((err, bot) => {
-    // start the real time message client
-    if (err) {
-      throw new Error(err)
-    }
+  slackbot.startRTM((err, bot) => {
+    if (err) throw new Error(err)
 
     console.log('Poking channels that need better activity')
 
     controller.trigger('poke_channels_activity', [bot])
   })
 })
-
-// if (moment().format('dddd') === 'Friday') {
 
 // ---------------------- milestones ---------------------- //
 
