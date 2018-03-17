@@ -3,7 +3,7 @@ import schedule from 'node-schedule'
 import moment from 'moment'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { getMilestone, checkOnTerm } from './data-actions/milestones'
+import { getMilestone, checkOnTerm, daysBeforeStart} from './data-actions/milestones'
 
 let currentWeek = 0
 let onTerm = false
@@ -164,9 +164,18 @@ const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 },
   console.log('Updating the expected term bounds are correct')
 
   // We are not in a term and we haven't confirmed correct term start/end dates
-  /*
-   * TODO: Check with admin to make sure that currently assigned
-   * start/end dates are correct
-   */
   onTerm = checkOnTerm()
 })
+
+daysBeforeStart()
+
+// const updateChannelsList = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
+//   if (!onTerm && daysBeforeStart() < 4) {
+
+//   }
+// })
+
+/*
+ * TODO: Check with admin to make sure that currently assigned
+ * start/end dates are correct
+ */

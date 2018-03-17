@@ -19,9 +19,10 @@ while (firstDayWinter.format('dddd') !== 'Monday' && firstDayWinter.format('dddd
   firstDayWinter.add(1, 'days')
 }
 firstDayWinter = shiftToWednesday(firstDayWinter)
-lastDayWinter = firstDayWinter.add(10, 'weeks')
-console.log(`First day of winter term: ${firstDayWinter}`)
-console.log(`Last day of winter term: ${lastDayWinter}`)
+lastDayWinter = firstDayWinter.clone()
+lastDayWinter.add(10, 'weeks')
+console.log('First day of winter term:', firstDayWinter)
+console.log('Last day of winter term:', lastDayWinter)
 
 // Spring term ranges
 const firstWeekSpring = moment().week(12)
@@ -31,9 +32,10 @@ while (firstDaySpring.format('dddd') !== 'Monday') {
   firstDaySpring.add(1, 'days')
 }
 firstDaySpring = shiftToWednesday(firstDaySpring)
-lastDaySpring = firstDaySpring.add(10, 'weeks')
-console.log(`First day of spring term: ${firstDaySpring}`)
-console.log(`Last day of winter term: ${lastDaySpring}`)
+lastDaySpring = firstDaySpring.clone()
+lastDaySpring.add(10, 'weeks')
+console.log('First day of spring term:', firstDaySpring)
+console.log('Last day of winter term:', lastDaySpring)
 
 // Summer term ranges
 const firstWeekSummer = moment().week(24)
@@ -43,9 +45,10 @@ while (firstDaySummer.format('dddd') !== 'Thursday') {
   firstDaySummer.add(1, 'days')
 }
 firstDaySummer = shiftToWednesday(firstDaySummer)
-lastDaySummer = firstDaySummer.add(10, 'weeks')
-console.log(`First day of summer term: ${firstDaySummer}`)
-console.log(`Last day of summer term: ${lastDaySummer}`)
+lastDaySummer = firstDaySummer.clone()
+lastDaySummer.add(10, 'weeks')
+console.log('First day of summer term:', firstDaySummer)
+console.log('Last day of summer term:', lastDaySummer)
 
 // Fall term ranges
 const firstWeekFall = moment().week(36)
@@ -55,9 +58,11 @@ while ((firstDayFall.format('dddd') !== 'Monday' && firstDayFall.format('dddd') 
   firstDayFall.add(1, 'days')
 }
 firstDayFall = shiftToWednesday(firstDayFall)
-lastDayFall = firstDayFall.add(10, 'weeks')
-console.log(`First day of summer term: ${firstDayFall}`)
-console.log(`Last day of summer term: ${lastDayFall}`)
+lastDayFall = firstDayFall.clone()
+lastDayFall.add(10, 'weeks')
+// lastDayFall.add(10, 'weeks')
+console.log('First day of fall term:', firstDayFall)
+console.log('Last day of fall term:', lastDayFall)
 
 /*
  * Checks to see if the current date is in
@@ -126,4 +131,14 @@ export const getMilestone = (week) => {
   milestone += '\nBut wait, there\'s more! Check out https://build.dali.dartmouth.edu for the full list of tasks.'
 
   return milestone
+}
+
+export const daysBeforeStart = () => {
+  const startDates = [firstDayWinter, firstDaySpring, firstDaySummer, firstDayFall]
+  let minDays = 10000
+  startDates.forEach(startDate => {
+    minDays = Math.min(minDays, Math.abs(moment().diff(startDate, 'days')))
+    console.log(moment(), startDate, minDays)
+  })
+  return 3
 }
