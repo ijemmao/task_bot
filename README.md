@@ -53,6 +53,13 @@ Gets all the users in the local Slack database
 
 Gets all the users from the DALI API
 
+### **Channel Activity**
+
+`channels_activity` - GET, POST
+
+Gets all the channels that needs to be poked. Then pokes those channels with a message
+
+
 **Note**: There are two sources that this bot is interacting with:
 * Local Slack Database - Included in this repo, there is a local database that holds Slack related user information
 * DALI API - A private API created by [@johnlev](https://github.com/johnlev) that stores updated DALI member information
