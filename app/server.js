@@ -108,11 +108,10 @@ controller.hears('remove', ['direct_message'], (bot, message) => {
     const channelName = message.text.split(' ')[1]
     const channelReferences = channelName.splot(/[<|#>]/).filter(item => item.length > 0)
 
-    // removeChannel(bot, channelReferences)
-    // .then(response => {
-    //   bot.reply(message, response)
-    // })
-    // bot.reply(message, removeChannel(`#${channelReferences[1]}`))
+    removeChannel(bot, channelReferences)
+    .then(response => {
+      bot.reply(message, response)
+    })
   }
 })
 

@@ -60,8 +60,16 @@ export const addChannel = (bot, channelName) => {
  * Removes a channel from the local confirmChannels object
  * Doesn't make the task bot leave yet
  */
-export const removeChannel = (channelName) => {
+export const removeChannel = (bot, channelName) => {
   const currentChannels = new Set(confirmChannels.channels)
-  currentChannels.delete(channelName)
-  return confirmChannels.channels
+  return new Promise((resolve, reject) => {
+    bot.api.channels.info({ channel: channelName[0] }, (err, res) => {
+      if (err) reject(err)
+      currentChannels.delete(channelName)
+      resolve(`Removed <#${channelName[0]}|${channelName[1]}>`)
+    })
+  })
+  .catch(e => {
+    return `There seems to be an error: ${e}`
+  })
 }
