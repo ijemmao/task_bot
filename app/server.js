@@ -8,6 +8,14 @@ import { getMilestone } from './data-actions/milestones'
 
 let currentWeek = 0
 let onTerm = false
+
+const shiftToWednesday = (termStartDate) => {
+  while (termStartDate.format('dddd') !== 'Wednesday') {
+    termStartDate.add(1, 'days')
+  }
+  return termStartDate
+}
+
 // winter
 const firstWeekWinter = moment().week(1)
 const firstDayWinter = firstWeekWinter.add(3 - firstWeekWinter.get('date'), 'days')
@@ -15,30 +23,37 @@ const lastWeekWinter = moment().week(10)
 while (firstDayWinter.format('dddd') !== 'Monday' && firstDayWinter.format('dddd') !== 'Wednesday') {
   firstDayWinter.add(1, 'days')
 }
+firstDayWinter = shiftToWednesday(firstDayWinter)
 console.log(firstDayWinter)
 // console.log(lastWeekWinter)
+
 // spring
 const firstWeekSpring = moment().week(12)
 const firstDaySpring = firstWeekSpring
 while (firstDaySpring.format('dddd') !== 'Monday') {
   firstDaySpring.add(1, 'days')
 }
+firstDaySpring = shiftToWednesday(firstDaySpring)
 console.log(firstDaySpring)
 // console.log(moment().week(22))
+
 // summer
 const firstWeekSummer = moment().week(24)
 const firstDaySummer = firstWeekSummer
 while (firstDaySummer.format('dddd') !== 'Thursday') {
   firstDaySummer.add(1, 'days')
 }
+firstDaySummer = shiftToWednesday(firstDaySummer)
 console.log(firstDaySummer)
 // console.log(moment().week(34))
+
 // fall
 const firstWeekFall = moment().week(36)
 const firstDayFall = firstWeekFall
 while ((firstDayFall.format('dddd') !== 'Monday' && firstDayFall.format('dddd') !== 'Wednesday') || firstDayFall.get('date') < 11) {
   firstDayFall.add(1, 'days')
 }
+firstDayFall = shiftToWednesday(firstDayFall)
 console.log(firstDayFall)
 // console.log(moment().week(46))
 // botkit controller
