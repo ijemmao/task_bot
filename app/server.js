@@ -7,6 +7,7 @@ import { checkChannelActivity } from './data-actions/automate-tasks'
 import { getMilestone } from './data-actions/milestones'
 
 let currentWeek = 0
+let onTerm = false
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -146,13 +147,14 @@ const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, seco
 // Slacks out channels current milestones every Tuesday at 10AM
 const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 2 }, () => {
   console.log('Sending out milestone reminder')
-  currentWeek += 1
-
   slackbot.startRTM((err, bot) => {
     if (err) throw new Error(err)
 
-    console.log('Sending milestones')
-    controller.trigger('send_milestones', [bot, currentWeek])
+    console.log('Sending milestones if currently on a term')
+    if (onTerm) {
+      currentWeek += 1
+      controller.trigger('send_milestones', [bot, currentWeek])
+    }
     // reset the week counter
     if (currentWeek === 10) currentWeek = 0
   })
