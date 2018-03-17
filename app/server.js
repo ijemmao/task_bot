@@ -18,7 +18,7 @@ const shiftToWednesday = (termStartDate) => {
 
 // winter
 const firstWeekWinter = moment().week(1)
-const firstDayWinter = firstWeekWinter.add(3 - firstWeekWinter.get('date'), 'days')
+let firstDayWinter = firstWeekWinter.add(3 - firstWeekWinter.get('date'), 'days')
 const lastWeekWinter = moment().week(10)
 while (firstDayWinter.format('dddd') !== 'Monday' && firstDayWinter.format('dddd') !== 'Wednesday') {
   firstDayWinter.add(1, 'days')
@@ -29,7 +29,7 @@ console.log(firstDayWinter)
 
 // spring
 const firstWeekSpring = moment().week(12)
-const firstDaySpring = firstWeekSpring
+let firstDaySpring = firstWeekSpring
 while (firstDaySpring.format('dddd') !== 'Monday') {
   firstDaySpring.add(1, 'days')
 }
@@ -39,7 +39,7 @@ console.log(firstDaySpring)
 
 // summer
 const firstWeekSummer = moment().week(24)
-const firstDaySummer = firstWeekSummer
+let firstDaySummer = firstWeekSummer
 while (firstDaySummer.format('dddd') !== 'Thursday') {
   firstDaySummer.add(1, 'days')
 }
@@ -49,7 +49,7 @@ console.log(firstDaySummer)
 
 // fall
 const firstWeekFall = moment().week(36)
-const firstDayFall = firstWeekFall
+let firstDayFall = firstWeekFall
 while ((firstDayFall.format('dddd') !== 'Monday' && firstDayFall.format('dddd') !== 'Wednesday') || firstDayFall.get('date') < 11) {
   firstDayFall.add(1, 'days')
 }
