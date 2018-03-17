@@ -55,9 +55,9 @@ Gets all the users from the DALI API
 
 ### **Channel Activity**
 
-`channels_activity` - GET, POST
+`poke_channels_activity` - POST
 
-Gets all the channels that needs to be poked. Then pokes those channels with a message
+Pokes all the channels with low channel activity in the past week. The message is sent out every Saturday at 10AM.
 
 
 **Note**: There are two sources that this bot is interacting with:
