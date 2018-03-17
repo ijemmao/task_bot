@@ -8,8 +8,6 @@ import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
 import { checkChannelActivity } from './data-actions/automate-tasks'
 
-let channelMessages = []
-
 // botkit controller
 const controller = botkit.slackbot({
   debug: false,
@@ -43,13 +41,15 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
  * With provided data, this function will decide whether or not this channel
  * is active
  */
-controller.hears('channels_activity', ['direct_message'], (bot, message) => {
+controller.on('poke_channels_activity', (bot) => {
 
   // Unix timestamp of last week
   const lastWeekUnix = moment().subtract(1, 'weeks').endOf('isoWeek').unix()
+  
 
   bot.api.channels.list({}, (err, res) => {
     if (err) return err
+    console.log(res)
     const memberChannels = res.channels.filter(item => item.is_member)
 
     let channelMessages = {}
@@ -71,28 +71,6 @@ controller.hears('channels_activity', ['direct_message'], (bot, message) => {
       const channelsToPoke = getPokeChannels(values, 0.3)
       pokeChannels(bot, channelsToPoke)
     })
-  })
-})
-
-// ---------------------- listening ----------------------- //
-
-/*
- * Listens for any comment from any channel
- * Uses data structure that keeps track of each channel
- * it's respective members, and their comments
- */
-controller.on(['ambient', 'direct_message', 'file_share'], (bot, message) => {
-  bot.api.users.info({ user: message.user }, (err, res) => {
-    if (err) return err
-    if (!channelMessages[message.channel]) {
-      channelMessages[message.channel] = {}
-    }
-    if (res) {
-      if (!channelMessages[message.channel][res.user.id]) {
-        channelMessages[message.channel][res.user.id] = []
-      }
-      channelMessages[message.channel][res.user.id].push({ timestamp: message.ts, type: message.type })
-    }
   })
 })
 
@@ -136,49 +114,34 @@ controller.hears('add_user', ['direct_message'], (bot, message) => {
   })
 })
 
-// ---------------------- debugging ----------------------- //
-
-controller.hears(['show'], ['direct_message'], (bot, message) => {
-  console.log(channelMessages)
-})
-
 // ------------------- automated tasks ------------------- //
 
-// Slacks out channel productivity every Saturday
-const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, dayOfWeek: 6 }, () => {
+// Slacks out channel productivity every Saturday at 10AM
+const channelActivityReminder = schedule.scheduleJob({ hour: 19, minute: 1, second: 25, dayOfWeek: 5 }, () => {
   console.log('Reminding all channels that there are milestones to complete')
+
+
+  controller.spawn({
+    token: process.env.TASK_BOT_TOKEN,
+    // this grabs the slack token we exported earlier
+  }).startRTM((err, bot) => {
+    // start the real time message client
+    if (err) {
+      throw new Error(err)
+    }
+
+    console.log('Poking channels that need better activity')
+
+    controller.trigger('poke_channels_activity', [bot])
+  })
+  // controller.spawn({ token: process.env.ASK_BOT_TOKEN }, (bot) => {
+  //   console.log('Poking channels that need better activity')
+
+  //   controller.trigger('poke_channels_activity', [bot])
+  // })
 })
 
 // if (moment().format('dddd') === 'Friday') {
-//   // Unix timestamp of last week
-
-//   const lastWeekUnix = moment().subtract(1, 'weeks').endOf('isoWeek').unix()
-
-//   bot.api.channels.list({}, (err, res) => {
-//     if (err) return err
-//     const membersChannels = res.channels.filter(item => item.is_member)
-
-//     let channelMessages = {}
-
-//     const tasks = memberChannels.map(channel => {
-//       return new Promise((resolve, reject) => {
-//         bot.api.channels.history({ channel: channel.id, oldest: lastWeekUnix }, (err1, res1) => {
-//           if (err1) reject(err1)
-//           resolve({ id: channel.id, messages: res1.messages })
-//         })
-//         .catch(e => {
-//           console.log(e)
-//         })
-//       })
-//     })
-
-//     Promise.all(tasks).then(values => {
-//       channelMessages = values
-//       const channelsToPoke = getPokeChannels(values, 0.3)
-//       checkChannelActivity(channelsToPoke)
-//     })
-//   })
-// }
 
 // ---------------------- milestones ---------------------- //
 
