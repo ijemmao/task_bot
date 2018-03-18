@@ -125,16 +125,25 @@ controller.hears('show', ['direct_message'], (bot, message) => {
 controller.hears('abort', ['direct_message'], (bot, message) => {
   updatingChannels = false
   // Set a reminder to confirm channels at a later date
+  bot.reply(message, 'Alright, I\'ll check back tomorrow at 10AM')
+  const dateToRecheck = moment().add(1, 'days').hour(10).toDate()
+  const restartConfirmation = schedule.scheduleJob(dateToRecheck, () => {
+    console.log('Set a reminder for tomorrow at 10AM to start conversation again')
+    startChannelUpdate()
+  })
 })
 
 controller.hears('complete', ['direct_message'], (bot, message) => {
   updatingChannels = false
-  bot.reply(message, 'Sweet, thanks for updating the channels list\nIf you want to update the channels list later, just use the command `update_channels`')
+  bot.reply(message, 'Sweet, thanks for updating the channels list!\n\n')
+  bot.reply(message, `Here is the final list of channels:\n${formatLists(confirmChannels.channels)}`)
+  bot.reply(message, '\nIf you want to update the channels list later, just use the command *update_channels*')
 })
 
 controller.hears('update_channels', ['direct_message'], (bot, message) => {
   updatingChannels = true
   bot.reply(message, 'Alright, let\'s update this channel list!')
+  startChannelUpdate(false)
 })
 
 
@@ -176,46 +185,49 @@ const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 },
   onTerm = checkOnTerm()
 })
 
-// Grabs users that have already spoken to the task bot
-slackbot.startRTM((err, bot) => {
-  if (err) throw new Error(err)
+const startChannelUpdate = (includeIntro = true) => {
+  // Grabs users that have already spoken to the task bot
+  slackbot.startRTM((err, bot) => {
+    if (err) throw new Error(err)
 
-  bot.api.im.list({}, (error, res) => {
-    const imChannels = res.ims
-    const userPromises = imChannels.map(im => {
-      return new Promise((resolve, reject) => {
-        bot.api.users.info({ user: im.user }, (err1, res1) => {
-          if (err1) reject(err1)
-          resolve({ user: res1.user, im })
+    bot.api.im.list({}, (error, res) => {
+      const imChannels = res.ims
+      const userPromises = imChannels.map(im => {
+        return new Promise((resolve, reject) => {
+          bot.api.users.info({ user: im.user }, (err1, res1) => {
+            if (err1) reject(err1)
+            resolve({ user: res1.user, im })
+          })
         })
+          .catch(e => {
+            console.log(e)
+          })
       })
-      .catch(e => {
-        console.log(e)
-      })
-    })
-    Promise.all(userPromises).then(values => {
-      const adminUsers = values.filter(item => {
-        return item.user.real_name === 'Ijemma Onwuzulike'
-      })
-      return adminUsers
-    })
-    .then(adminUsers => {
-      populateChannels(bot)
-      .then(trackedChannels => {
-        bot.say({ channel: 'D9G8BAN8L', text: getMessage() }, (err2, res2) => {
-          if (err2) return err2
-          updatingChannels = true
+      Promise.all(userPromises).then(values => {
+        const adminUsers = values.filter(item => {
+          return item.user.real_name === 'Ijemma Onwuzulike'
         })
+        return adminUsers
       })
+        .then(adminUsers => {
+          populateChannels(bot)
+            .then(trackedChannels => {
+              bot.say({ channel: 'D9G8BAN8L', text: getMessage(includeIntro) }, (err2, res2) => {
+                if (err2) return err2
+                updatingChannels = true
+              })
+            })
+        })
     })
   })
-})
+}
+
+startChannelUpdate()
 
 // const updateChannelsList = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
 //   if (!onTerm && daysBeforeStart() < 4) {
 //     /*
 //      * Send out to the following conversational body:
-//      * - Update the Channels List
 //      * - Confirm the start date of the term or first Wednesday
 //      * meeting
 //      * - Etc.
@@ -223,9 +235,7 @@ slackbot.startRTM((err, bot) => {
 //     slackbot.startRTM((err, bot) => {
 //       if (err) throw new Error(err)
 
-//       bot.api.conversation.create({ name: 'Ijemma Onwuzulike', is_private: true }, (err, res) => {
-//         console.log('starting conversation')
-//       })
+//       startChannelUpdate()
 //     })
 //   }
 // })

@@ -1,15 +1,15 @@
 import { formatDicts } from './markdown'
 
 export let confirmChannels = {
-  introMessage: 'Heyyo! The term is coming up soon.\nI wanted to update my list of channels to follow\n',
-  channelsListHeader: 'Currently, I keep track of the following channels:\n\n',
+  introMessage: '\nHeyyo! The term is coming up soon.\nI wanted to update my list of channels to follow\n',
+  channelsListHeader: 'Currently, I\'m keeping track of the following channels:\n\n',
   channels: [],
   commandsHeader: 'Please update the list by using the following commands:\n',
   commands: {
     add: '*add &lt;#channel-name&gt;* - Adds a channel to the list',
     remove: '*remove &lt;#channel-name&gt;* - Removes a channel from the list',
     show: '*show* - Show the current list of tracked channels',
-    abort: '*abort* - Ends conformation but will be resumed tomorrow at same time',
+    abort: '*abort* - Ends conformation but will be resumed tomorrow at 10AM',
     complete: '*complete* - Confirms the list of channels to track',
   },
 }
@@ -68,6 +68,7 @@ export const removeChannel = (bot, channelName) => {
       if (err) reject(err)
       currentChannels.delete(`<#${channelName[0]}|${channelName[1]}>`)
       // currentChannels.delete(channelName)
+      confirmChannels.channels = [...currentChannels]
       resolve(`Removed <#${channelName[0]}|${channelName[1]}>`)
     })
   })
@@ -76,9 +77,10 @@ export const removeChannel = (bot, channelName) => {
   })
 }
 
-export const getMessage = () => {
+export const getMessage = (includeIntro) => {
   let channelMessage = ''
   for (const section in confirmChannels) {
+    if (!includeIntro && section === 'introMessage') continue
     if (section !== 'channels' && section !== 'commands') {
       channelMessage += confirmChannels[section]
     } else {
