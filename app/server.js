@@ -138,7 +138,7 @@ controller.hears('complete', ['direct_message'], (bot, message) => {
   bot.reply(message, 'Sweet, thanks for updating the channels list!\n\n')
   bot.reply(message, `Here is the final list of channels:\n${formatLists(confirmChannels.channels)}`)
   bot.reply(message, '\nIf you want to update the channels list later, just use the command *update_channels*')
-  // TODO: post to a database with the list of channels that need to be followed
+  handleUpdatedChannels(bot, message, confirmChannels.channels)
 })
 
 controller.hears('update_channels', ['direct_message'], (bot, message) => {
@@ -185,6 +185,58 @@ const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 },
   // We are not in a term and we haven't confirmed correct term start/end dates
   onTerm = checkOnTerm()
 })
+
+const handleUpdatedChannels = (bot, message, updatedChannels) => {
+  bot.api.channels.list({}, (err, res) => {
+    const handleChannels = []
+    const updateChannelsCleaned = updatedChannels.map(channel => {
+      return channel.split(/[<|#>]/).filter(item => item.length > 0)[0]
+    })
+    const memberChannels = res.channels.filter(item => item.is_member).map(item => item.id)
+
+    // Cross checking the channels to join and leave channels
+    updatedChannels.forEach(channel => {
+      const channelId = channel.split(/[<|#>]/).filter(item => item.length > 0)[0]
+      const channelName = channel.split(/[<|#>]/).filter(item => item.length > 0)[1]
+      if (!memberChannels.includes(channelId)) {
+        // Join the channel
+        handleChannels.push(
+          new Promise((resolve, reject) => {
+            bot.reply(message, `/join ${channel}`)
+            // bot.api.chat.command({ channel: channelId, command: '/join', text: channel }, (err1, res1) => {
+            //   if (err1) reject(err1)
+            //   resolve(res1)
+            // })
+          })
+          .catch(e => {
+            return `There was an error with joining a channel: ${e}`
+          })
+        )
+      }
+    })
+    memberChannels.forEach(channelId => {
+      if (!updateChannelsCleaned.includes(channelId)) {
+        // Leave the channel
+        // handleChannels.push(
+        //   new Promise((resolve, reject) => {
+        //     bot.api.channels.leave({ channel: channelId }, (err1, res1) => {
+        //       if (err1) reject(err1)
+        //       resolve(res1)
+        //     })
+        //   })
+        //   .catch(e => {
+        //     return `There was an error with leaving a channel: ${e}`
+        //   })
+        // )
+      }
+    })
+
+    // Executing all join/leave promises at the same time
+    Promise.all(handleChannels).then(values => {
+      console.log(values)
+    })
+  })
+}
 
 const startChannelUpdate = (includeIntro = true) => {
   // Grabs users that have already spoken to the task bot
