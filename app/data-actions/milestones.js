@@ -13,27 +13,27 @@ const shiftToWednesday = (termStartDate) => {
 
 // Winter term ranges
 const firstWeekWinter = moment().week(1)
-let firstDayWinter = firstWeekWinter.add(3 - firstWeekWinter.get('date'), 'days')
+let firstDayWinter = firstWeekWinter.add(2, 'days')
 let lastDayWinter = moment()
 while (firstDayWinter.format('dddd') !== 'Monday' && firstDayWinter.format('dddd') !== 'Wednesday') {
   firstDayWinter.add(1, 'days')
 }
 firstDayWinter = shiftToWednesday(firstDayWinter)
-lastDayWinter = firstDayWinter.add(10, 'weeks')
-console.log(`First day of winter term: ${firstDayWinter}`)
-console.log(`Last day of winter term: ${lastDayWinter}`)
+lastDayWinter = firstDayWinter.clone().add(10, 'weeks')
+console.log('First day of winter term:', firstDayWinter)
+console.log('Last day of winter term:', lastDayWinter)
 
 // Spring term ranges
-const firstWeekSpring = moment().week(12)
+const firstWeekSpring = moment().week(13)
 let firstDaySpring = firstWeekSpring
 let lastDaySpring = moment()
 while (firstDaySpring.format('dddd') !== 'Monday') {
   firstDaySpring.add(1, 'days')
 }
 firstDaySpring = shiftToWednesday(firstDaySpring)
-lastDaySpring = firstDaySpring.add(10, 'weeks')
-console.log(`First day of spring term: ${firstDaySpring}`)
-console.log(`Last day of winter term: ${lastDaySpring}`)
+lastDaySpring = firstDaySpring.clone().add(10, 'weeks')
+console.log('First day of spring term:', firstDaySpring)
+console.log('Last day of winter term:', lastDaySpring)
 
 // Summer term ranges
 const firstWeekSummer = moment().week(24)
@@ -43,9 +43,9 @@ while (firstDaySummer.format('dddd') !== 'Thursday') {
   firstDaySummer.add(1, 'days')
 }
 firstDaySummer = shiftToWednesday(firstDaySummer)
-lastDaySummer = firstDaySummer.add(10, 'weeks')
-console.log(`First day of summer term: ${firstDaySummer}`)
-console.log(`Last day of summer term: ${lastDaySummer}`)
+lastDaySummer = firstDaySummer.clone().add(10, 'weeks')
+console.log('First day of summer term:', firstDaySummer)
+console.log('Last day of summer term:', lastDaySummer)
 
 // Fall term ranges
 const firstWeekFall = moment().week(36)
@@ -55,27 +55,27 @@ while ((firstDayFall.format('dddd') !== 'Monday' && firstDayFall.format('dddd') 
   firstDayFall.add(1, 'days')
 }
 firstDayFall = shiftToWednesday(firstDayFall)
-lastDayFall = firstDayFall.add(10, 'weeks')
-console.log(`First day of summer term: ${firstDayFall}`)
-console.log(`Last day of summer term: ${lastDayFall}`)
+lastDayFall = firstDayFall.clone().add(10, 'weeks')
+console.log('First day of summer term:', firstDayFall)
+console.log('Last day of summer term:', lastDayFall)
 
 /*
  * Checks to see if the current date is in
  * one of the slated term ranges
  */
 export const checkOnTerm = () => {
-  const ranges = [
-    [firstDayWinter, lastDayWinter],
-    [firstDaySpring, lastDaySpring],
-    [firstDaySummer, lastDaySummer],
-    [firstDayFall, firstDayFall],
+  const terms = [
+    { term: 'winter', ranges: [firstDayWinter, lastDayWinter] },
+    { term: 'spring', ranges: [firstDaySpring, lastDaySpring] },
+    { term: 'summer', ranges: [firstDaySummer, lastDaySummer] },
+    { term: 'fall', ranges: [firstDayFall, firstDayFall] },
   ]
-  ranges.forEach(currentRange => {
-    if (moment().range(currentRange[0], currentRange[1]).contains(moment())) {
-      return true
+  terms.forEach(currentTerm => {
+    if (moment().range(currentTerm.ranges[0], currentTerm.ranges[1]).contains(moment())) {
+      return { term: currentTerm.term, onTerm: true }
     }
   })
-  return false
+  return { term: null, onTerm: false }
 }
 
 /*
@@ -126,4 +126,18 @@ export const getMilestone = (week) => {
   milestone += '\nBut wait, there\'s more! Check out https://build.dali.dartmouth.edu for the full list of tasks.'
 
   return milestone
+}
+
+/*
+ * Returns the start date of a specified term
+ * @param term - String representation of term
+ */
+export const getTermStartDate = (term) => {
+  const termStartDates = {
+    winter: firstDayWinter,
+    spring: firstDaySpring,
+    summer: firstDaySummer,
+    fall: firstDayFall,
+  }
+  return termStartDates[term]
 }

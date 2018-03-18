@@ -3,9 +3,10 @@ import schedule from 'node-schedule'
 import moment from 'moment'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { getMilestone, checkOnTerm } from './data-actions/milestones'
+import { getMilestone, checkOnTerm, getTermStartDate } from './data-actions/milestones'
 
 let currentWeek = 0
+let currentTerm = null
 let onTerm = false
 
 // botkit controller
@@ -151,7 +152,7 @@ const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0,
 
     console.log('Sending milestones if currently on a term')
     if (onTerm) {
-      currentWeek += 1
+      currentWeek = moment().diff(getTermStartDate(currentTerm), 'weeks')
       if (onTerm) controller.trigger('send_milestones', [bot, currentWeek])
     }
     // reset the week counter
@@ -168,5 +169,7 @@ const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 },
    * TODO: Check with admin to make sure that currently assigned
    * start/end dates are correct
    */
-  onTerm = checkOnTerm()
+  const termResults = checkOnTerm()
+  currentTerm = termResults.term
+  onTerm = termResults.onTerm
 })
