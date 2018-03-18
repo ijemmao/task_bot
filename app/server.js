@@ -107,7 +107,7 @@ controller.hears('add', ['direct_message'], (bot, message) => {
 controller.hears('remove', ['direct_message'], (bot, message) => {
   if (updatingChannels) {
     const channelName = message.text.split(' ')[1]
-    const channelReferences = channelName.splot(/[<|#>]/).filter(item => item.length > 0)
+    const channelReferences = channelName.split(/[<|#>]/).filter(item => item.length > 0)
 
     removeChannel(bot, channelReferences)
     .then(response => {
@@ -117,8 +117,9 @@ controller.hears('remove', ['direct_message'], (bot, message) => {
 })
 
 controller.hears('show', ['direct_message'], (bot, message) => {
-  console.log(confirmChannels.channels)
-  bot.reply(message, formatLists(confirmChannels.channels))
+  if (updatingChannels) {
+    bot.reply(message, formatLists(confirmChannels.channels))
+  }
 })
 
 controller.hears('abort', ['direct_message'], (bot, message) => {
@@ -201,7 +202,7 @@ slackbot.startRTM((err, bot) => {
     .then(adminUsers => {
       populateChannels(bot)
       .then(trackedChannels => {
-        bot.api.chat.postMessage({ channel: 'D9G8BAN8L', text: getMessage() }, (err2, res2) => {
+        bot.say({ channel: 'D9G8BAN8L', text: getMessage() }, (err2, res2) => {
           if (err2) return err2
           updatingChannels = true
         })

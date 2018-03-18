@@ -73,7 +73,7 @@ export const pokeChannels = (bot, channels) => {
       if (err) return err
 
       const message = generateChannelMessage()
-      bot.api.chat.postMessage({ channel: id, text: message }, (err, res) => {})
+      bot.say({ channel: id, text: message }, (err, res) => {})
     })
   })
 }
