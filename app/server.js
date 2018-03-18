@@ -23,14 +23,15 @@ const slackbot = controller.spawn({
   // this grabs the slack token we exported earlier
 })
 
+const slackbotRTM = slackbot.startRTM((err, bot) => {
+  // start the real time message client
+  if (err) throw new Error(err)
+})
+
 console.log('Task Bot is up and running!')
 
 // prepare webhook
 controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
-  const slackbotRTM = slackbot.startRTM(err => {
-    // start the real time message client
-    if (err) throw new Error(err)
-  })
   controller.createWebhookEndpoints(webserver, slackbotRTM, () => {
     if (err) {
       throw new Error(err)
@@ -119,12 +120,14 @@ controller.on('send_term_start_confirmation', (bot) => {
 controller.hears('update_start', ['direct_message'], (bot, message) => {
   if (updatingDates) {
     const newStartDate = moment(message.text.split(' ')[1], 'MM-DD-YYYY')
+    bot.reply(message, `Updated start date: ${newStartDate.format('dddd, MMMM Do YYYY')}`)
   }
 })
 
 controller.hears('update_end', ['direct_message'], (bot, message) => {
   if (updatingDates) {
     const newEndDate = moment(message.text.split(' ')[1], 'MM-DD-YYYY')
+    bot.reply(message, `Updated end date: ${newEndDate.format('dddd, MMMM Do YYYY')}`)
   }
 })
 
@@ -192,29 +195,20 @@ controller.hears('add_user', ['direct_message'], (bot, message) => {
 // Slacks out channel productivity every Saturday at 10AM
 const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 6 }, () => {
   console.log('Reminding all channels that there are milestones to complete')
-
-  slackbot.startRTM((err, bot) => {
-    if (err) throw new Error(err)
-
-    console.log('Poking channels that need better activity')
-    if (onTerm) controller.trigger('poke_channels_activity', [bot])
-  })
+  console.log('Poking channels that need better activity')
+  if (onTerm) controller.trigger('poke_channels_activity', [slackbotRTM])
 })
 
 // Slacks out channels current milestones every Tuesday at 10AM
 const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 2 }, () => {
   console.log('Sending out milestone reminder')
-  slackbot.startRTM((err, bot) => {
-    if (err) throw new Error(err)
-
-    console.log('Sending milestones if currently on a term')
-    if (onTerm) {
-      currentWeek = moment().diff(getTermStartDate(currentTerm), 'weeks')
-      if (onTerm) controller.trigger('send_milestones', [bot, currentWeek])
-    }
-    // reset the week counter
-    if (currentWeek === 10) currentWeek = 0
-  })
+  console.log('Sending milestones if currently on a term')
+  if (onTerm) {
+    currentWeek = moment().diff(getTermStartDate(currentTerm), 'weeks')
+    if (onTerm) controller.trigger('send_milestones', [slackbotRTM, currentWeek])
+  }
+  // reset the week counter
+  if (currentWeek === 10) currentWeek = 0
 })
 
 // Checks daily at 12AM to see if term start/end dates are correct
@@ -231,12 +225,8 @@ const updateTermInfo = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, (
   onTerm = termResults.onTerm
 })
 
-slackbot.startRTM((err, bot) => {
-  if (err) throw new Error(err)
-
-  console.log('Sending confirmation message to user')
-  controller.trigger('send_term_start_confirmation', [bot])
-})
+console.log('Sending confirmation message to user')
+controller.trigger('send_term_start_confirmation', [slackbotRTM])
 
 // Checks daily at 10AM to see whether the bot should update the start dates for the term
 const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
