@@ -1,9 +1,10 @@
 import botkit from 'botkit'
 import schedule from 'node-schedule'
 import moment from 'moment'
+import { formatLists } from './data-actions/markdown'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
 import { getMilestone, checkOnTerm, daysBeforeStart } from './data-actions/milestones'
-import { confirmChannels, addChannel, removeChannel, populateChannels } from './data-actions/confirm-information'
+import { confirmChannels, addChannel, removeChannel, getMessage, populateChannels } from './data-actions/confirm-information'
 
 let currentWeek = 0
 let onTerm = false
@@ -115,6 +116,26 @@ controller.hears('remove', ['direct_message'], (bot, message) => {
   }
 })
 
+controller.hears('show', ['direct_message'], (bot, message) => {
+  console.log(confirmChannels.channels)
+  bot.reply(message, formatLists(confirmChannels.channels))
+})
+
+controller.hears('abort', ['direct_message'], (bot, message) => {
+  updatingChannels = false
+  // Set a reminder to confirm channels at a later date
+})
+
+controller.hears('complete', ['direct_message'], (bot, message) => {
+  updatingChannels = false
+  bot.reply(message, 'Sweet, thanks for updating the channels list\nIf you want to update the channels list later, just use the command `update_channels`')
+})
+
+controller.hears('update_channels', ['direct_message'], (bot, message) => {
+  updatingChannels = true
+  bot.reply(message, 'Alright, let\'s update this channel list!')
+})
+
 
 // ------------------- automated tasks ------------------- //
 
@@ -155,42 +176,39 @@ const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 },
 })
 
 // Grabs users that have already spoken to the task bot
-// slackbot.startRTM((err, bot) => {
-//   if (err) throw new Error(err)
+slackbot.startRTM((err, bot) => {
+  if (err) throw new Error(err)
 
-//   bot.api.im.list({}, (error, res) => {
-//     const imChannels = res.ims
-//     const userPromises = imChannels.map(im => {
-//       return new Promise((resolve, reject) => {
-//         bot.api.users.info({ user: im.user }, (err1, res1) => {
-//           if (err1) reject(err1)
-//           resolve({ user: res1.user, im })
-//         })
-//       })
-//       .catch(e => {
-//         console.log(e)
-//       })
-//     })
-//     Promise.all(userPromises).then(values => {
-//       const adminUsers = values.filter(item => {
-//         return item.user.real_name === 'Ijemma Onwuzulike'
-//       })
-//       return adminUsers
-//     })
-//     .then(adminUsers => {
-//       bot.api.chat.postMessage({ channel: 'D9G8BAN8L', text: 'confirmChannels' }, (err2, res2) => {
-//         if (err2) return err2
-//         updatingChannels = true
-//         // populateChannels(bot)
-//         // .then(currentlyTrackedChannels => {
-//         //   console.log(currentlyTrackedChannels)
-//         //   addChannel('#task-bot-test3')
-//         //   console.log(confirmChannels.channels)
-//         // })
-//       })
-//     })
-//   })
-// })
+  bot.api.im.list({}, (error, res) => {
+    const imChannels = res.ims
+    const userPromises = imChannels.map(im => {
+      return new Promise((resolve, reject) => {
+        bot.api.users.info({ user: im.user }, (err1, res1) => {
+          if (err1) reject(err1)
+          resolve({ user: res1.user, im })
+        })
+      })
+      .catch(e => {
+        console.log(e)
+      })
+    })
+    Promise.all(userPromises).then(values => {
+      const adminUsers = values.filter(item => {
+        return item.user.real_name === 'Ijemma Onwuzulike'
+      })
+      return adminUsers
+    })
+    .then(adminUsers => {
+      populateChannels(bot)
+      .then(trackedChannels => {
+        bot.api.chat.postMessage({ channel: 'D9G8BAN8L', text: getMessage() }, (err2, res2) => {
+          if (err2) return err2
+          updatingChannels = true
+        })
+      })
+    })
+  })
+})
 
 // const updateChannelsList = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
 //   if (!onTerm && daysBeforeStart() < 4) {

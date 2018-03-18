@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { formatHeader, formatDicts } from './markdown'
 import data from './../../mock_data/milestones'
 
 /*
@@ -84,27 +85,6 @@ export const checkOnTerm = () => {
 }
 
 /*
- * Takes a given header, makes it bold, all uppercase, and adds a
- * newline character at the ned of it.
- */
-const formatHeader = (key) => {
-  return `\n*${key.toUpperCase()}*:\n`
-}
-
-/*
- * Format items in a dictionary into a bullet list format where each
- * line is tabbed.
- */
-const formatLists = (dict) => {
-  let result = ''
-
-  for (const item in dict) {
-    result += `\t• ${dict[item]}\n`
-  }
-  return result
-}
-
-/*
 * getMilestone() takes in the current week number and gets and formats the milestone for
 * that week.
 */
@@ -120,9 +100,9 @@ export const getMilestone = (week) => {
     if (section !== 'milestone' && section !== 'title') {
       milestone += formatHeader(section)
       if (typeof rawMilestone[section] === typeof new Object()) {
-        milestone += formatLists(rawMilestone[section])
+        milestone += formatDicts(rawMilestone[section])
       } else {
-        milestone += (`${rawMilestone[section]}\n`)
+        milestone += `${rawMilestone[section]}\n`
       }
     }
   }

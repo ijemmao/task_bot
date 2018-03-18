@@ -1,15 +1,17 @@
+import { formatDicts } from './markdown'
+
 export let confirmChannels = {
-  introMessage: 'Heyyo! The term is coming up soon. I wanted to update my list of channels to follow\n',
-  channelsListHeader: 'Currently, I keep track of the following channels',
+  introMessage: 'Heyyo! The term is coming up soon.\nI wanted to update my list of channels to follow\n',
+  channelsListHeader: 'Currently, I keep track of the following channels:\n\n',
   channels: [],
   commandsHeader: 'Please update the list by using the following commands:\n',
-  commands: [
-    { use: 'add #channel-name', description: 'Adds a channel to the list' },
-    { use: 'remove #channel-name', description: 'Removes a channel from the list' },
-    { use: 'show', description: 'Show the current list of tracked channels' },
-    { use: 'abort', description: 'Ends conformation but will be resumed tomorrow at same time' },
-    { use: 'complete', description: 'Confirms the list of channels to track' },
-  ],
+  commands: {
+    add: '*add &lt;#channel-name&gt;* - Adds a channel to the list',
+    remove: '*remove &lt;#channel-name&gt;* - Removes a channel from the list',
+    show: '*show* - Show the current list of tracked channels',
+    abort: '*abort* - Ends conformation but will be resumed tomorrow at same time',
+    complete: '*complete* - Confirms the list of channels to track',
+  },
 }
 
 /*
@@ -24,8 +26,8 @@ export const populateChannels = (bot) => {
       const trackChannels = []
       const memberChannels = res.channels.filter(item => item.is_member)
       memberChannels.forEach(channel => {
-        if (!currentChannels.has(`#${channel.name}`)) {
-          trackChannels.push(`#${channel.name}`)
+        if (!currentChannels.has(`<#${channel.id}|${channel.name}>`)) {
+          trackChannels.push(`<#${channel.id}|${channel.name}>`)
         }
       })
       confirmChannels.channels = trackChannels
@@ -44,9 +46,8 @@ export const addChannel = (bot, channelName) => {
     bot.api.channels.info({ channel: channelName[0] }, (err, res) => {
       if (err) reject(err)
       if (!currentChannels.has(channelName)) {
-        currentChannels.add(channelName)
+        currentChannels.add(`<#${channelName[0]}|${channelName[1]}>`)
         confirmChannels.channels = [...currentChannels]
-        // resolve(`Added #${channelName[1]}`)
         resolve(`Added <#${channelName[0]}|${channelName[1]}>`)
       }
     })
@@ -65,11 +66,24 @@ export const removeChannel = (bot, channelName) => {
   return new Promise((resolve, reject) => {
     bot.api.channels.info({ channel: channelName[0] }, (err, res) => {
       if (err) reject(err)
-      currentChannels.delete(channelName)
+      currentChannels.delete(`<#${channelName[0]}|${channelName[1]}>`)
+      // currentChannels.delete(channelName)
       resolve(`Removed <#${channelName[0]}|${channelName[1]}>`)
     })
   })
   .catch(e => {
     return `There seems to be an error: ${e}`
   })
+}
+
+export const getMessage = () => {
+  let channelMessage = ''
+  for (const section in confirmChannels) {
+    if (section !== 'channels' && section !== 'commands') {
+      channelMessage += confirmChannels[section]
+    } else {
+      channelMessage += formatDicts(confirmChannels[section])
+    }
+  }
+  return channelMessage
 }
