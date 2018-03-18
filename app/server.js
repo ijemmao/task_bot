@@ -138,6 +138,7 @@ controller.hears('complete', ['direct_message'], (bot, message) => {
   bot.reply(message, 'Sweet, thanks for updating the channels list!\n\n')
   bot.reply(message, `Here is the final list of channels:\n${formatLists(confirmChannels.channels)}`)
   bot.reply(message, '\nIf you want to update the channels list later, just use the command *update_channels*')
+  // TODO: post to a database with the list of channels that need to be followed
 })
 
 controller.hears('update_channels', ['direct_message'], (bot, message) => {

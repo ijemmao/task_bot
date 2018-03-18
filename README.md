@@ -27,31 +27,11 @@ Task Bot is up and running!
 ## Commands 💪🏾
 There are a list of commands that the task bot will recognize by **direct messages** - you must be in DM channel for the bot to respond
 
-### **Add Users**
+### **Update Channels List**
 
-`add_user <@slack_id>` - POST
+`update_channels` - POST
 
-Adds the specified slack user into the local database
-
-##### Example
-
-`add_user @ijemmao`
-
-Adds the slack user `@ijemmao` to the local database
-
-`add_all_users` - POST
-
-Adds all users in the slack team
-
-### **Get Users**
-
-`get_all_users` - GET
-
-Gets all the users in the local Slack database
-
-`get_dali_users` - GET
-
-Gets all the users from the DALI API
+Starts the conversation that will allow a selected user to update the channels that should be tracked.
 
 ### **Channel Activity**
 
