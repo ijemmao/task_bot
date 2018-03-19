@@ -3,7 +3,7 @@ import schedule from 'node-schedule'
 import moment from 'moment'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { checkOnTerm, getTermStartDate, daysBeforeStart, getConfirmDatesMessage } from './data-actions/term-dates'
+import { checkOnTerm, getTermStartDate, daysBeforeStart, getConfirmDatesMessage, generateTermDates } from './data-actions/term-dates'
 import { getMilestone } from './data-actions/milestones'
 
 let currentWeek = 0
@@ -232,13 +232,16 @@ controller.trigger('send_term_start_confirmation', [slackbotRTM])
 const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
   console.log('Updating the term start date')
 
-  if (daysBeforeStart < 4 && !confirmedDate) {
-    // Start conversation with user to update term dates
-    // slackbot.startRTM((err, bot) => {
-    //   if (err) throw new Error(err)
-
-    //   console.log('Sending confirmation message to user')
-    //   controller.trigger('send_term_start_confirmation', [bot])
-    // })
+  if (!confirmedDate) {
+    const generatedTerms = generateTermDates()
+    const termStartDates = []
+    for (const term in generatedTerms) {
+      termStartDates.push(generatedTerms[term].ranges[0])
+    }
+    if (daysBeforeStart(termStartDates) < 4) {
+      // Start the conversation to confirm start dates
+    } else {
+      console.log(daysBeforeStart(termStartDates))
+    }
   }
 })
