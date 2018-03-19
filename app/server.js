@@ -11,7 +11,7 @@ import { getMilestone } from './data-actions/milestones'
 let currentWeek = 0
 let currentTerm = null
 let onTerm = false
-let confirmedDate = false
+let confirmedDates = false
 let updatingDates = getConfirmDatesMessage
 
 // botkit controller
@@ -152,6 +152,7 @@ controller.hears('show', ['direct_message'], (bot, message) => {
 
 controller.hears('abort', ['direct_message'], (bot, message) => {
   if (updatingDates) {
+    updatingDates = false
     bot.reply(message, 'Alright, I will check back in with you tomorrow at 10AM')
     const tomorrowAtTen = moment().add(1, 'days').hour(10).toDate()
     const confirmDatesTomorrow = schedule.scheduleJob(tomorrowAtTen, () => {
@@ -162,7 +163,9 @@ controller.hears('abort', ['direct_message'], (bot, message) => {
 
 controller.hears('complete', ['direct_message'], (bot, message) => {
   if (updatingDates) {
-    bot.reply(message, 'Sweet! Thanks for updating the dates!\n\nUse update_term_dates to update the upcoming term start and end')
+    updatingDates = false
+    confirmedDates = true
+    bot.reply(message, 'Sweet! Thanks for updating the dates!\n\nUse *update_term_dates* to update the upcoming term start and end')
   }
 })
 
