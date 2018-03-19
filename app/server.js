@@ -7,7 +7,6 @@ import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
 import { 
   checkOnTerm,
-  getTermStartDate,
   daysBeforeStart,
   getConfirmDatesMessage,
   generateTermDates,
@@ -15,7 +14,7 @@ import {
   updateEndDate,
   getUpdatedDates,
 } from './data-actions/term-dates'
-import { updateTerm } from './db-actions/term-actions'
+import { updateTerm, getTerm } from './db-actions/term-actions'
 import { getMilestone } from './data-actions/milestones'
 
 let currentWeek = 0
@@ -148,15 +147,13 @@ controller.hears('update_end', ['direct_message'], (bot, message) => {
 
 controller.hears('show', ['direct_message'], (bot, message) => {
   if (updatingDates) {
-    getTermStartDate('spring').then(date => {
-      const updatedStart = getUpdatedDates()[0]
-      const updatedEnd = getUpdatedDates()[1]
-      const currentDates = [
-        `Current start date: ${updatedStart.format('dddd, MMMM Do YYYY')}`,
-        `Current end date: ${updatedEnd.format('dddd, MMMM Do YYYY')}`,
-      ]
-      bot.reply(message, formatLists(currentDates))
-    })
+    const updatedStart = getUpdatedDates()[0]
+    const updatedEnd = getUpdatedDates()[1]
+    const currentDates = [
+      `Current start date: ${updatedStart.format('dddd, MMMM Do YYYY')}`,
+      `Current end date: ${updatedEnd.format('dddd, MMMM Do YYYY')}`,
+    ]
+    bot.reply(message, formatLists(currentDates))
   }
 })
 
@@ -237,9 +234,9 @@ const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0,
   console.log('Sending out milestone reminder')
   console.log('Sending milestones if currently on a term')
   if (onTerm) {
-    getTermStartDate(currentTerm)
+    getTerm(currentTerm)
     .then(currentTerm => {
-      currentWeek = moment().diff(currentTerm, 'weeks')
+      currentWeek = moment().diff(currentTerm.startDate, 'weeks')
       if (onTerm) controller.trigger('send_milestones', [slackbotRTM, currentWeek])
     }) 
   }
@@ -262,9 +259,9 @@ const updateTermInfo = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, (
 })
 
 controller.hears('meme', ['direct_message'], (bot, message) => {
-  getTermStartDate('spring')
-  .then(startDate => {
-    console.log('Current start date: ', startDate)
+  getTerm('spring')
+  .then(currentTerm => {
+    console.log('Current start date: ', currentTerm.startDate)
   })
 })
 

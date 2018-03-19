@@ -117,21 +117,6 @@ export const getUpdatedDates = () => {
   return [newStartDate, newEndDate]
 }
 
-/*
- * Returns the start date of a specified term
- * @param term - String representation of term
- */
-export const getTermStartDate = (term) => {
-  return new Promise((resolve, reject) => {
-    getTerm(term)
-      .exec((err, res) => {
-        if (err) reject(err)
-        console.log(res.startDate)
-        resolve(res.startDate)
-      })
-  })
-}
-
 let confirmDatesMessage = {
   introMessage: '\nHey! I wanted to check to see if my start date for the upcoming term is correct!\n',
   introCurrentDates: 'I currently have the following dates:\n\n',
@@ -151,11 +136,10 @@ export const getConfirmDatesMessage = (currentTerm) => {
   let startDate = null
   let endDate = null
   return new Promise((resolve, reject) => {
-    getTermStartDate(currentTerm)
-      .then(resStart => {
-        console.log(resStart)
-        startDate = moment(resStart)
-        endDate = moment(resStart).clone().add(10, 'weeks')
+    getTerm(currentTerm)
+      .then(term => {
+        startDate = moment(term.startDate)
+        endDate = moment(term.endDate)
         for (const section in confirmDatesMessage) {
           if (section !== 'dates' && section !== 'commands') {
             message += confirmDatesMessage[section]
