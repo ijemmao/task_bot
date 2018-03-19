@@ -192,7 +192,7 @@ controller.hears(/(update_term_dates)\b/, ['direct_message'], (bot, message) => 
 /*
  * Adds all users into the database
  */
-controller.hears('add_all_users', ['direct_message'], (bot, message) => {
+controller.hears(/(add_all_users)\b/, ['direct_message'], (bot, message) => {
   bot.api.users.list({}, (err, res) => {
     if (err) return err
     res.members.forEach(member => {
@@ -208,7 +208,7 @@ controller.hears('add_all_users', ['direct_message'], (bot, message) => {
 /*
  * Grabs all users from DALI-API
  */
-controller.hears('get_dali_users', ['direct_message'], (bot, message) => {
+controller.hears(/(get_dali_users)\b/, ['direct_message'], (bot, message) => {
   getDALIUsers()
   .then(res => { return res.json() })
   .then(json => {
@@ -219,7 +219,7 @@ controller.hears('get_dali_users', ['direct_message'], (bot, message) => {
 /*
  * Adds a specified user
  */
-controller.hears('add_user', ['direct_message'], (bot, message) => {
+controller.hears(/(add_user)\b/, ['direct_message'], (bot, message) => {
   const newUser = message.text.split(/[ <>@]/).filter(item => item.length > 0)[1]
   bot.api.users.info({ user: newUser }, (err, res) => {
     createUser(res.user)
