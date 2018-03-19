@@ -24,6 +24,23 @@ You should see the following message telling you have started the project succes
 Task Bot is up and running!
 ```
 
+You will need to have a local instance of MongoDB running in order to handle the data:
+
+In one tab in your terminal run:
+```bash
+mongod
+```
+
+In another tab run:
+```bash
+mongo task_bot
+```
+This is the name of the database for this project.
+
+#### Generation Scripts
+There is some data that needs to be present in the database to ensure that future manipulation works.
+Go to `app/scripts` to find all the data generation scripts necessary in order to interact with the bot fully.
+
 ## Commands 💪🏾
 There are a list of commands that the task bot will recognize by **direct messages** - you must be in DM channel for the bot to respond
 
