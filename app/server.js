@@ -121,31 +121,32 @@ controller.on('send_term_start_confirmation', (bot) => {
     bot.api.im.open({ user: adminUser.id }, (err1, res1) => {
       const directChannelId = res1.channel.id
       updatingDates = true
-      getConfirmDatesMessage(currentTerm)
-      .then(message => {
-        bot.say({ channel: directChannelId, text: message }, () => { })
-      })
+      // getConfirmDatesMessage(currentTerm)
+      getConfirmDatesMessage('spring')
+        .then(message => {
+          bot.say({ channel: directChannelId, text: message }, () => { })
+        })
     })
   })
 })
 
 // --------------- confirming start dates ----------------- //
 
-controller.hears('update_start', ['direct_message'], (bot, message) => {
+controller.hears(/(update_start)\b/, ['direct_message'], (bot, message) => {
   if (updatingDates) {
     updateStartDate(moment(message.text.split(' ')[1], 'MM-DD-YYYY'))
     bot.reply(message, `Updated start date: ${getUpdatedDates()[0].format('dddd, MMMM Do YYYY')}`)
   }
 })
 
-controller.hears('update_end', ['direct_message'], (bot, message) => {
+controller.hears(/(update_end)\b/, ['direct_message'], (bot, message) => {
   if (updatingDates) {
     updateEndDate(moment(message.text.split(' ')[1], 'MM-DD-YYYY'))
     bot.reply(message, `Updated end date: ${getUpdatedDates()[1].format('dddd, MMMM Do YYYY')}`)
   }
 })
 
-controller.hears('show', ['direct_message'], (bot, message) => {
+controller.hears(/(show)\b/, ['direct_message'], (bot, message) => {
   if (updatingDates) {
     const updatedStart = getUpdatedDates()[0]
     const updatedEnd = getUpdatedDates()[1]
@@ -157,7 +158,7 @@ controller.hears('show', ['direct_message'], (bot, message) => {
   }
 })
 
-controller.hears('abort', ['direct_message'], (bot, message) => {
+controller.hears(/(abort)\b/, ['direct_message'], (bot, message) => {
   if (updatingDates) {
     updatingDates = false
     bot.reply(message, 'Alright, I will check back in with you tomorrow at 10AM')
@@ -168,7 +169,7 @@ controller.hears('abort', ['direct_message'], (bot, message) => {
   }
 })
 
-controller.hears('complete', ['direct_message'], (bot, message) => {
+controller.hears(/(complete)\b/, ['direct_message'], (bot, message) => {
   if (updatingDates) {
     updatingDates = false
     confirmedDates = true
@@ -180,7 +181,7 @@ controller.hears('complete', ['direct_message'], (bot, message) => {
   }
 })
 
-controller.hears('update_term_dates', ['direct_message'], (bot, message) => {
+controller.hears(/(update_term_dates)\b/, ['direct_message'], (bot, message) => {
   if (!updatingDates) {
     controller.trigger('send_term_start_confirmation', [bot])
   }
