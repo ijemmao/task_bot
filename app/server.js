@@ -273,7 +273,7 @@ const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 },
     // Checks to see if it is less than four days before the next term
     const pulledTerms = termDates()
     const daysBefore = daysBeforeStart(pulledTerms).daysBefore
-    currentTerm = daysBeforeStart(pulledTerms).daysBefore
+    currentTerm = daysBeforeStart(pulledTerms).upcomingTerm
     if (daysBefore < 4) {
       updatingDates = true
       confirmedDates = false

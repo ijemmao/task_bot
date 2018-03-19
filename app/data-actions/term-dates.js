@@ -105,15 +105,15 @@ export const checkOnTerm = (terms) => {
  */
 export const daysBeforeStart = (terms) => {
   let minDays = 10000
-  let currentTerm = null
+  let upcomingTerm = null
   terms.forEach(term => {
     const daysDifference = Math.abs(moment().diff(term.ranges[0], 'days'))
     if (minDays > daysDifference) {
       minDays = daysDifference
-      currentTerm = term.term
+      upcomingTerm = term.term
     }
   })
-  return { daysBefore: minDays, currentTerm }
+  return { daysBefore: minDays, upcomingTerm }
 }
 
 export const updateStartDate = (date) => {
