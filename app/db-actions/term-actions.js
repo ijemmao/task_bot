@@ -21,9 +21,9 @@ export function updateTerm(data) {
 }
 
 export function getTerm(termName) {
-  Term.findOne({ name: termName })
-  .exec((err, res) => {
-    if (err) return err
-    return res
-  })
+  return Term.findOne({ name: termName })
+  // .exec((err, res) => {
+  //   if (err) return err
+  //   return res
+  // })
 }

@@ -2,16 +2,17 @@ import botkit from 'botkit'
 import schedule from 'node-schedule'
 import moment from 'moment'
 import * as db from './db'
+import { formatLists } from './data-actions/markdown'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { checkOnTerm, getTermStartDate, daysBeforeStart, getConfirmDatesMessage, generateTermDates } from './data-actions/term-dates'
+import { checkOnTerm, getTermStartDate, daysBeforeStart, getConfirmDatesMessage, generateTermDates, updateStartDate, updateEndDate, getUpdatedDates } from './data-actions/term-dates'
 import { getMilestone } from './data-actions/milestones'
 
 let currentWeek = 0
 let currentTerm = null
 let onTerm = false
 let confirmedDate = false
-let updatingDates = false
+let updatingDates = getConfirmDatesMessage
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -111,7 +112,10 @@ controller.on('send_term_start_confirmation', (bot) => {
     bot.api.im.open({ user: adminUser.id }, (err1, res1) => {
       const directChannelId = res1.channel.id
       updatingDates = true
-      bot.say({ channel: directChannelId, text: getConfirmDatesMessage() }, () => {})
+      getConfirmDatesMessage()
+      .then(message => {
+        bot.say({ channel: directChannelId, text: message }, () => { })
+      })
     })
   })
 })
@@ -120,34 +124,45 @@ controller.on('send_term_start_confirmation', (bot) => {
 
 controller.hears('update_start', ['direct_message'], (bot, message) => {
   if (updatingDates) {
-    const newStartDate = moment(message.text.split(' ')[1], 'MM-DD-YYYY')
-    bot.reply(message, `Updated start date: ${newStartDate.format('dddd, MMMM Do YYYY')}`)
+    updateStartDate(moment(message.text.split(' ')[1], 'MM-DD-YYYY'))
+    bot.reply(message, `Updated start date: ${getUpdatedDates()[0]}`)
   }
 })
 
 controller.hears('update_end', ['direct_message'], (bot, message) => {
   if (updatingDates) {
-    const newEndDate = moment(message.text.split(' ')[1], 'MM-DD-YYYY')
-    bot.reply(message, `Updated end date: ${newEndDate.format('dddd, MMMM Do YYYY')}`)
+    updateEndDate(moment(message.text.split(' ')[1], 'MM-DD-YYYY'))
+    bot.reply(message, `Updated end date: ${getUpdatedDates()[1]}`)
   }
 })
 
 controller.hears('show', ['direct_message'], (bot, message) => {
   if (updatingDates) {
-    // Show the currently updated dates
+    getTermStartDate('spring').then(date => {
+      const updatedStart = getUpdatedDates()[0]
+      const updatedEnd = getUpdatedDates()[1]
+      const currentDates = [
+        `Current start date: ${updatedStart}`,
+        `Current end date: ${updatedEnd}`,
+      ]
+      bot.reply(message, formatLists(currentDates))
+    })
   }
 })
 
 controller.hears('abort', ['direct_message'], (bot, message) => {
   if (updatingDates) {
     bot.reply(message, 'Alright, I will check back in with you tomorrow at 10AM')
-    // Create schedule
+    const tomorrowAtTen = moment().add(1, 'days').hour(10).toDate()
+    const confirmDatesTomorrow = schedule.scheduleJob(tomorrowAtTen, () => {
+      controller.trigger('send_term_start_confirmation', [slackbotRTM])
+    })
   }
 })
 
 controller.hears('complete', ['direct_message'], (bot, message) => {
   if (updatingDates) {
-    bot.reply(message, 'Sweet! Thanks for updating the dates!')
+    bot.reply(message, 'Sweet! Thanks for updating the dates!\n\nUse update_term_dates to update the upcoming term start and end')
   }
 })
 
@@ -205,11 +220,14 @@ const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0,
   console.log('Sending out milestone reminder')
   console.log('Sending milestones if currently on a term')
   if (onTerm) {
-    currentWeek = moment().diff(getTermStartDate(currentTerm), 'weeks')
-    if (onTerm) controller.trigger('send_milestones', [slackbotRTM, currentWeek])
+    getTermStartDate(currentTerm)
+    .then(currentTerm => {
+      currentWeek = moment().diff(currentTerm, 'weeks')
+      if (onTerm) controller.trigger('send_milestones', [slackbotRTM, currentWeek])
+    }) 
   }
-  // reset the week counter
-  if (currentWeek === 10) currentWeek = 0
+  // // reset the week counter
+  // if (currentWeek === 10) currentWeek = 0
 })
 
 // Checks daily at 12AM to see if term start/end dates are correct
@@ -227,11 +245,14 @@ const updateTermInfo = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, (
 })
 
 controller.hears('meme', ['direct_message'], (bot, message) => {
-  console.log(getTermStartDate('spring'))
+  getTermStartDate('spring')
+  .then(startDate => {
+    console.log('Current start date: ', startDate)
+  })
 })
 
 console.log('Sending confirmation message to user')
-// controller.trigger('send_term_start_confirmation', [slackbotRTM])
+controller.trigger('send_term_start_confirmation', [slackbotRTM])
 
 // Checks daily at 10AM to see whether the bot should update the start dates for the term
 const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {

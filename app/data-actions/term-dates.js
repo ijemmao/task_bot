@@ -2,6 +2,9 @@ import moment from 'moment'
 import { formatLists } from './markdown'
 import { getTerm } from './../db-actions/term-actions'
 
+let newStartDate
+let newEndDate
+
 /*
  * Shifts the provided date to the first Wednesday
  */
@@ -97,40 +100,78 @@ export const daysBeforeStart = (termStartDates) => {
   return minDays
 }
 
+export const updateStartDate = (date) => {
+  newStartDate = date.format('dddd, MMMM Do YYYY')
+}
+
+export const updateEndDate = (date) => {
+  newEndDate = date.format('dddd, MMMM Do YYYY')
+}
+
+/*
+ * Returns a list of the start and end dates of the
+ * currently handled term. The dates are already
+ * formatted
+ */
+export const getUpdatedDates = () => {
+  return [newStartDate, newEndDate]
+}
+
 /*
  * Returns the start date of a specified term
  * @param term - String representation of term
  */
 export const getTermStartDate = (term) => {
-  const currentTerm = getTerm(term)
-  return currentTerm.startDate
+  return new Promise((resolve, reject) => {
+    getTerm(term)
+      .exec((err, res) => {
+        if (err) reject(err)
+        console.log(res.startDate)
+        resolve(res.startDate)
+      })
+  })
 }
 
-// let confirmDatesMessage = {
-//   introMessage: '\nHey! I wanted to check to see if my start date for the upcoming term is correct!\n',
-//   introCurrentDates: 'I currently have the following dates:\n\n',
-//   dates: [
-//     `Start date - ${getTermStartDate('spring').format('dddd, MMMM Do YYYY')}`,
-//     `End date - ${getTermStartDate('spring').add(10, 'weeks').format('dddd, MMMM Do YYYY')}`,
-//   ],
-//   introCommands: '\nHere is a list of commands that should be used:\n\n',
-//   commands: [
-//     '*update_start MM-DD-YYYY* - updates the start date. i.e. 09-10-2018',
-//     '*update_end MM-DD-YYYY* - updates the end date',
-//     '*show* - shows the updated dates',
-//     '*abort* - ends confirmation and will be reminded tomorrow at 10AM',
-//     '*complete* - completes confirmation',
-//   ],
-// }
+let confirmDatesMessage = {
+  introMessage: '\nHey! I wanted to check to see if my start date for the upcoming term is correct!\n',
+  introCurrentDates: 'I currently have the following dates:\n\n',
+  dates: [],
+  introCommands: '\nHere is a list of commands that should be used:\n\n',
+  commands: [
+    '*update_start MM-DD-YYYY* - updates the start date. i.e. 09-10-2018',
+    '*update_end MM-DD-YYYY* - updates the end date',
+    '*show* - shows the updated dates',
+    '*abort* - ends confirmation and will be reminded tomorrow at 10AM',
+    '*complete* - completes confirmation',
+  ],
+}
 
 export const getConfirmDatesMessage = () => {
   let message = ''
-  for (const section in confirmDatesMessage) {
-    if (section !== 'dates' && section !== 'commands') {
-      message += confirmDatesMessage[section]
-    } else {
-      message += formatLists(confirmDatesMessage[section])
-    }
-  }
-  return message
+  let startDate = null
+  let endDate = null
+  return new Promise((resolve, reject) => {
+    getTermStartDate('spring')
+      .then(resStart => {
+        console.log(resStart)
+        startDate = moment(resStart).format('dddd, MMMM Do YYYY')
+        endDate = moment(resStart).clone().add(10, 'weeks').format('dddd, MMMM Do YYYY')
+        for (const section in confirmDatesMessage) {
+          if (section !== 'dates' && section !== 'commands') {
+            message += confirmDatesMessage[section]
+          } else {
+            if (section === 'dates') {
+              newStartDate = startDate
+              newEndDate = endDate
+              confirmDatesMessage[section] = [
+                `Start date - ${startDate}`,
+                `End date - ${endDate}`,
+              ]
+            }
+            message += formatLists(confirmDatesMessage[section])
+          }
+        }
+        resolve(message)
+      })
+  })
 }
