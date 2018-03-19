@@ -1,5 +1,10 @@
 import Term from './../models/term'
 
+/*
+ * Creates a new Term model in the database.
+ * Used for populating database with initial
+ * information.
+ */
 export function createTerm(data) {
   const termData = { name: data.name, startDate: data.startDate, endDate: data.endDate }
   const newTerm = new Term(termData)
@@ -9,6 +14,10 @@ export function createTerm(data) {
   })
 }
 
+/*
+ * Updates the specified Term. The correct
+ * Term is found with the name property.
+ */
 export function updateTerm(data) {
   return new Promise((resolve, reject) => {
     Term.update(
@@ -22,10 +31,18 @@ export function updateTerm(data) {
   })
 }
 
+/*
+ * Gets a Term object from the database using
+ * the Term's name property.
+ */
 export function getTerm(termName) {
   return Term.findOne({ name: termName })
 }
 
-export function getTerm() {
+/*
+ * Gets all the Term objects currently existing
+ * in the local database.
+ */
+export function getTerms() {
   return Term.find({})
 }

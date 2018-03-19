@@ -253,10 +253,6 @@ const updateTermInfo = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, (
   console.log('Updating the expected term bounds are correct')
 
   // We are not in a term and we haven't confirmed correct term start/end dates
-  /*
-   * TODO: Check with admin to make sure that currently assigned
-   * start/end dates are correct
-   */
   const termResults = checkOnTerm()
   currentTerm = termResults.term
   onTerm = termResults.onTerm

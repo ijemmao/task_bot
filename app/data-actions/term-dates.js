@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { formatLists } from './markdown'
-import { getTerm, getTerms} from './../db-actions/term-actions'
+import { getTerm, getTerms } from './../db-actions/term-actions'
 
 let newStartDate
 let newEndDate
@@ -15,6 +15,11 @@ const shiftToWednesday = (termStartDate) => {
   return termStartDate
 }
 
+/*
+ * Generates possible term start and end dates
+ * for all terms. Once generated, the terms will
+ * then be presented to admin user to confirm
+ */
 export const generateTermDates = () => {
   // Winter term ranges
   const firstWeekWinter = moment().week(1)
@@ -74,6 +79,10 @@ export const generateTermDates = () => {
   return terms
 }
 
+/*
+ * Grabs from database and creates a list that holds
+ * the term name and the start/end dates
+ */
 export const termDates = () => {
   const terms = []
   return new Promise((resolve, reject) => {
@@ -116,10 +125,16 @@ export const daysBeforeStart = (terms) => {
   return { daysBefore: minDays, upcomingTerm }
 }
 
+/*
+ * Updates the local newStartDate variable
+ */
 export const updateStartDate = (date) => {
   newStartDate = date
 }
 
+/*
+ * Updates the local newEndDate variable
+ */
 export const updateEndDate = (date) => {
   newEndDate = date
 }
@@ -133,7 +148,11 @@ export const getUpdatedDates = () => {
   return [newStartDate, newEndDate]
 }
 
-let confirmDatesMessage = {
+/*
+ * Confirmation message that will be sent out to
+ * admin user to begin updating term dates
+ */
+const confirmDatesMessage = {
   introMessage: '\nHey! I wanted to check to see if my start date for the upcoming term is correct!\n',
   introCurrentDates: 'I currently have the following dates:\n\n',
   dates: [],
@@ -147,6 +166,10 @@ let confirmDatesMessage = {
   ],
 }
 
+/*
+ * Works with the confirmDatesMessage object to populate the
+ * blank dates section. Grabs information from database
+ */
 export const getConfirmDatesMessage = (currentTerm) => {
   let message = ''
   let startDate = null
