@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { formatLists } from './markdown'
-import { getTerm } from './../db-actions/term-actions'
+import { getTerm, getTerms} from './../db-actions/term-actions'
 
 let newStartDate
 let newEndDate
@@ -74,6 +74,19 @@ export const generateTermDates = () => {
   return terms
 }
 
+export const termDates = () => {
+  const terms = []
+  return new Promise((resolve, reject) => {
+    getTerms()
+    .exec((err, res) => {
+      if (err) return err
+      res.forEach(term => {
+        terms.push({ term: term.name, ranges: [term.startDate, term.endDate] })
+      })
+    })
+  })
+}
+
 /*
  * Checks to see if the current date is in
  * one of the slated term ranges
@@ -90,14 +103,17 @@ export const checkOnTerm = (terms) => {
 /*
  * Calculates the days before the start of upcoming term
  */
-export const daysBeforeStart = (termStartDates) => {
-  const startDates = termStartDates
+export const daysBeforeStart = (terms) => {
   let minDays = 10000
-  startDates.forEach(startDate => {
-    minDays = Math.min(minDays, Math.abs(moment().diff(startDate, 'days')))
+  let currentTerm = null
+  terms.forEach(term => {
+    const daysDifference = Math.abs(moment().diff(term.ranges[0], 'days'))
+    if (minDays > daysDifference) {
+      minDays = daysDifference
+      currentTerm = term.term
+    }
   })
-  console.log(`Days before the next term starts: ${minDays}`)
-  return minDays
+  return { daysBefore: minDays, currentTerm }
 }
 
 export const updateStartDate = (date) => {

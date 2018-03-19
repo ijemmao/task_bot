@@ -5,11 +5,11 @@ import * as db from './db'
 import { formatLists } from './data-actions/markdown'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { 
+import {
   checkOnTerm,
   daysBeforeStart,
   getConfirmDatesMessage,
-  generateTermDates,
+  termDates,
   updateStartDate,
   updateEndDate,
   getUpdatedDates,
@@ -121,7 +121,7 @@ controller.on('send_term_start_confirmation', (bot) => {
     bot.api.im.open({ user: adminUser.id }, (err1, res1) => {
       const directChannelId = res1.channel.id
       updatingDates = true
-      getConfirmDatesMessage('spring')
+      getConfirmDatesMessage(currentTerm)
       .then(message => {
         bot.say({ channel: directChannelId, text: message }, () => { })
       })
@@ -163,7 +163,7 @@ controller.hears('abort', ['direct_message'], (bot, message) => {
     bot.reply(message, 'Alright, I will check back in with you tomorrow at 10AM')
     const tomorrowAtTen = moment().add(1, 'days').hour(10).toDate()
     const confirmDatesTomorrow = schedule.scheduleJob(tomorrowAtTen, () => {
-      controller.trigger('send_term_start_confirmation', [slackbotRTM])
+      controller.trigger('send_term_start_confirmation', [bot])
     })
   }
 })
@@ -173,10 +173,16 @@ controller.hears('complete', ['direct_message'], (bot, message) => {
     updatingDates = false
     confirmedDates = true
     console.log(getUpdatedDates()[0], getUpdatedDates()[1])
-    updateTerm({ name: 'spring', startDate: getUpdatedDates()[0].toDate(), endDate: getUpdatedDates()[1].toDate() })
+    updateTerm({ name: currentTerm, startDate: getUpdatedDates()[0].toDate(), endDate: getUpdatedDates()[1].toDate() })
     .then(res => {
       bot.reply(message, 'Sweet! Thanks for updating the dates!\n\nUse *update_term_dates* to update the upcoming term start and end')
     })
+  }
+})
+
+controller.hears('update_term_dates', ['direct_message'], (bot, message) => {
+  if (!updatingDates) {
+    controller.trigger('send_term_start_confirmation', [bot])
   }
 })
 
@@ -238,10 +244,8 @@ const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0,
     .then(currentTerm => {
       currentWeek = moment().diff(currentTerm.startDate, 'weeks')
       if (onTerm) controller.trigger('send_milestones', [slackbotRTM, currentWeek])
-    }) 
+    })
   }
-  // // reset the week counter
-  // if (currentWeek === 10) currentWeek = 0
 })
 
 // Checks daily at 12AM to see if term start/end dates are correct
@@ -258,13 +262,6 @@ const updateTermInfo = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, (
   onTerm = termResults.onTerm
 })
 
-controller.hears('meme', ['direct_message'], (bot, message) => {
-  getTerm('spring')
-  .then(currentTerm => {
-    console.log('Current start date: ', currentTerm.startDate)
-  })
-})
-
 console.log('Sending confirmation message to user')
 controller.trigger('send_term_start_confirmation', [slackbotRTM])
 
@@ -272,16 +269,17 @@ controller.trigger('send_term_start_confirmation', [slackbotRTM])
 const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
   console.log('Updating the term start date')
 
-  if (!confirmedDate) {
-    const generatedTerms = generateTermDates()
-    const termStartDates = []
-    for (const term in generatedTerms) {
-      termStartDates.push(generatedTerms[term].ranges[0])
-    }
-    if (daysBeforeStart(termStartDates) < 4) {
+  if (!confirmedDates) {
+    // Checks to see if it is less than four days before the next term
+    const pulledTerms = termDates()
+    const daysBefore = daysBeforeStart(pulledTerms).daysBefore
+    currentTerm = daysBeforeStart(pulledTerms).daysBefore
+    if (daysBefore < 4) {
+      updatingDates = true
+      confirmedDates = false
       // Start the conversation to confirm start dates
     } else {
-      console.log(daysBeforeStart(termStartDates))
+      console.log(`Days before the upcoming term start: ${daysBefore}`)
     }
   }
 })

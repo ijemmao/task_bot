@@ -25,3 +25,7 @@ export function updateTerm(data) {
 export function getTerm(termName) {
   return Term.findOne({ name: termName })
 }
+
+export function getTerm() {
+  return Term.find({})
+}
