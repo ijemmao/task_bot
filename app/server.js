@@ -5,7 +5,17 @@ import * as db from './db'
 import { formatLists } from './data-actions/markdown'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { checkOnTerm, getTermStartDate, daysBeforeStart, getConfirmDatesMessage, generateTermDates, updateStartDate, updateEndDate, getUpdatedDates } from './data-actions/term-dates'
+import { 
+  checkOnTerm,
+  getTermStartDate,
+  daysBeforeStart,
+  getConfirmDatesMessage,
+  generateTermDates,
+  updateStartDate,
+  updateEndDate,
+  getUpdatedDates,
+} from './data-actions/term-dates'
+import { updateTerm } from './db-actions/term-actions'
 import { getMilestone } from './data-actions/milestones'
 
 let currentWeek = 0
@@ -112,7 +122,7 @@ controller.on('send_term_start_confirmation', (bot) => {
     bot.api.im.open({ user: adminUser.id }, (err1, res1) => {
       const directChannelId = res1.channel.id
       updatingDates = true
-      getConfirmDatesMessage()
+      getConfirmDatesMessage('spring')
       .then(message => {
         bot.say({ channel: directChannelId, text: message }, () => { })
       })
@@ -125,14 +135,14 @@ controller.on('send_term_start_confirmation', (bot) => {
 controller.hears('update_start', ['direct_message'], (bot, message) => {
   if (updatingDates) {
     updateStartDate(moment(message.text.split(' ')[1], 'MM-DD-YYYY'))
-    bot.reply(message, `Updated start date: ${getUpdatedDates()[0]}`)
+    bot.reply(message, `Updated start date: ${getUpdatedDates()[0].format('dddd, MMMM Do YYYY')}`)
   }
 })
 
 controller.hears('update_end', ['direct_message'], (bot, message) => {
   if (updatingDates) {
     updateEndDate(moment(message.text.split(' ')[1], 'MM-DD-YYYY'))
-    bot.reply(message, `Updated end date: ${getUpdatedDates()[1]}`)
+    bot.reply(message, `Updated end date: ${getUpdatedDates()[1].format('dddd, MMMM Do YYYY')}`)
   }
 })
 
@@ -142,8 +152,8 @@ controller.hears('show', ['direct_message'], (bot, message) => {
       const updatedStart = getUpdatedDates()[0]
       const updatedEnd = getUpdatedDates()[1]
       const currentDates = [
-        `Current start date: ${updatedStart}`,
-        `Current end date: ${updatedEnd}`,
+        `Current start date: ${updatedStart.format('dddd, MMMM Do YYYY')}`,
+        `Current end date: ${updatedEnd.format('dddd, MMMM Do YYYY')}`,
       ]
       bot.reply(message, formatLists(currentDates))
     })
@@ -165,7 +175,11 @@ controller.hears('complete', ['direct_message'], (bot, message) => {
   if (updatingDates) {
     updatingDates = false
     confirmedDates = true
-    bot.reply(message, 'Sweet! Thanks for updating the dates!\n\nUse *update_term_dates* to update the upcoming term start and end')
+    console.log(getUpdatedDates()[0], getUpdatedDates()[1])
+    updateTerm({ name: 'spring', startDate: getUpdatedDates()[0].toDate(), endDate: getUpdatedDates()[1].toDate() })
+    .then(res => {
+      bot.reply(message, 'Sweet! Thanks for updating the dates!\n\nUse *update_term_dates* to update the upcoming term start and end')
+    })
   }
 })
 

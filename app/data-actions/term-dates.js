@@ -101,11 +101,11 @@ export const daysBeforeStart = (termStartDates) => {
 }
 
 export const updateStartDate = (date) => {
-  newStartDate = date.format('dddd, MMMM Do YYYY')
+  newStartDate = date
 }
 
 export const updateEndDate = (date) => {
-  newEndDate = date.format('dddd, MMMM Do YYYY')
+  newEndDate = date
 }
 
 /*
@@ -146,16 +146,16 @@ let confirmDatesMessage = {
   ],
 }
 
-export const getConfirmDatesMessage = () => {
+export const getConfirmDatesMessage = (currentTerm) => {
   let message = ''
   let startDate = null
   let endDate = null
   return new Promise((resolve, reject) => {
-    getTermStartDate('spring')
+    getTermStartDate(currentTerm)
       .then(resStart => {
         console.log(resStart)
-        startDate = moment(resStart).format('dddd, MMMM Do YYYY')
-        endDate = moment(resStart).clone().add(10, 'weeks').format('dddd, MMMM Do YYYY')
+        startDate = moment(resStart)
+        endDate = moment(resStart).clone().add(10, 'weeks')
         for (const section in confirmDatesMessage) {
           if (section !== 'dates' && section !== 'commands') {
             message += confirmDatesMessage[section]
@@ -164,8 +164,8 @@ export const getConfirmDatesMessage = () => {
               newStartDate = startDate
               newEndDate = endDate
               confirmDatesMessage[section] = [
-                `Start date - ${startDate}`,
-                `End date - ${endDate}`,
+                `Start date - ${startDate.format('dddd, MMMM Do YYYY')}`,
+                `End date - ${endDate.format('dddd, MMMM Do YYYY')}`,
               ]
             }
             message += formatLists(confirmDatesMessage[section])
