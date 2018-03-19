@@ -121,7 +121,6 @@ controller.on('send_term_start_confirmation', (bot) => {
     bot.api.im.open({ user: adminUser.id }, (err1, res1) => {
       const directChannelId = res1.channel.id
       updatingDates = true
-      // getConfirmDatesMessage(currentTerm)
       getConfirmDatesMessage(currentTerm)
         .then(message => {
           bot.say({ channel: directChannelId, text: message }, () => { })
