@@ -14,17 +14,16 @@ export function updateTerm(data) {
     { name: data.name },
     { $set: { startDate: data.startDate, endDate: data.endDate } }
   )
-  .then((err, res) => {
+  .exec((err, res) => {
     if (err) return err
     console.log(`Successfully updated the term ${data.name}`)
   })
 }
 
 export function getTerm(termName) {
-  Term.find({ name: termName })
-  .then((err, res) => {
+  Term.findOne({ name: termName })
+  .exec((err, res) => {
     if (err) return err
-    console.log(`Successfully got the term ${termName}`)
     return res
   })
 }

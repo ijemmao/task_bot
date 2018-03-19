@@ -1,6 +1,7 @@
 import botkit from 'botkit'
 import schedule from 'node-schedule'
 import moment from 'moment'
+import * as db from './db'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
 import { checkOnTerm, getTermStartDate, daysBeforeStart, getConfirmDatesMessage, generateTermDates } from './data-actions/term-dates'
@@ -225,8 +226,12 @@ const updateTermInfo = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, (
   onTerm = termResults.onTerm
 })
 
+controller.hears('meme', ['direct_message'], (bot, message) => {
+  console.log(getTermStartDate('spring'))
+})
+
 console.log('Sending confirmation message to user')
-controller.trigger('send_term_start_confirmation', [slackbotRTM])
+// controller.trigger('send_term_start_confirmation', [slackbotRTM])
 
 // Checks daily at 10AM to see whether the bot should update the start dates for the term
 const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {

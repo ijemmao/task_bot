@@ -1,5 +1,6 @@
 import moment from 'moment'
 import { formatLists } from './markdown'
+import { getTerm } from './../db-actions/term-actions'
 
 /*
  * Shifts the provided date to the first Wednesday
@@ -101,32 +102,26 @@ export const daysBeforeStart = (termStartDates) => {
  * @param term - String representation of term
  */
 export const getTermStartDate = (term) => {
-  const termStartDates = generateTermDates()
-  let correctRange = null
-  termStartDates.forEach(currentTerm => {
-    if (currentTerm.term === term) {
-      correctRange = currentTerm.ranges[0]
-    }
-  })
-  return correctRange
+  const currentTerm = getTerm(term)
+  return currentTerm.startDate
 }
 
-let confirmDatesMessage = {
-  introMessage: '\nHey! I wanted to check to see if my start date for the upcoming term is correct!\n',
-  introCurrentDates: 'I currently have the following dates:\n\n',
-  dates: [
-    `Start date - ${getTermStartDate('spring').format('dddd, MMMM Do YYYY')}`,
-    `End date - ${getTermStartDate('spring').add(10, 'weeks').format('dddd, MMMM Do YYYY')}`,
-  ],
-  introCommands: '\nHere is a list of commands that should be used:\n\n',
-  commands: [
-    '*update_start MM-DD-YYYY* - updates the start date. i.e. 09-10-2018',
-    '*update_end MM-DD-YYYY* - updates the end date',
-    '*show* - shows the updated dates',
-    '*abort* - ends confirmation and will be reminded tomorrow at 10AM',
-    '*complete* - completes confirmation',
-  ],
-}
+// let confirmDatesMessage = {
+//   introMessage: '\nHey! I wanted to check to see if my start date for the upcoming term is correct!\n',
+//   introCurrentDates: 'I currently have the following dates:\n\n',
+//   dates: [
+//     `Start date - ${getTermStartDate('spring').format('dddd, MMMM Do YYYY')}`,
+//     `End date - ${getTermStartDate('spring').add(10, 'weeks').format('dddd, MMMM Do YYYY')}`,
+//   ],
+//   introCommands: '\nHere is a list of commands that should be used:\n\n',
+//   commands: [
+//     '*update_start MM-DD-YYYY* - updates the start date. i.e. 09-10-2018',
+//     '*update_end MM-DD-YYYY* - updates the end date',
+//     '*show* - shows the updated dates',
+//     '*abort* - ends confirmation and will be reminded tomorrow at 10AM',
+//     '*complete* - completes confirmation',
+//   ],
+// }
 
 export const getConfirmDatesMessage = () => {
   let message = ''
