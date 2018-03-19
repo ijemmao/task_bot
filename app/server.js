@@ -122,7 +122,7 @@ controller.on('send_term_start_confirmation', (bot) => {
       const directChannelId = res1.channel.id
       updatingDates = true
       // getConfirmDatesMessage(currentTerm)
-      getConfirmDatesMessage('spring')
+      getConfirmDatesMessage(currentTerm)
         .then(message => {
           bot.say({ channel: directChannelId, text: message }, () => { })
         })
@@ -271,9 +271,6 @@ const updateTermInfo = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, (
   onTerm = termResults.onTerm
 })
 
-console.log('Sending confirmation message to user')
-controller.trigger('send_term_start_confirmation', [slackbotRTM])
-
 // Checks daily at 10AM to see whether the bot should update the start dates for the term
 const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
   console.log('Updating the term start date')
@@ -287,6 +284,8 @@ const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 },
       updatingDates = true
       confirmedDates = false
       // Start the conversation to confirm start dates
+      console.log('Sending confirmation message to user')
+      controller.trigger('send_term_start_confirmation', [slackbotRTM])
     } else {
       console.log(`Days before the upcoming term start: ${daysBefore}`)
     }
