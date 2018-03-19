@@ -134,15 +134,27 @@ controller.on('send_term_start_confirmation', (bot) => {
 
 controller.hears(/(update_start)\b/, ['direct_message'], (bot, message) => {
   if (updatingDates) {
-    updateStartDate(moment(message.text.split(' ')[1], 'MM-DD-YYYY'))
-    bot.reply(message, `Updated start date: ${getUpdatedDates()[0].format('dddd, MMMM Do YYYY')}`)
+    const parsedDate = moment(message.text.split(' ')[1], 'MM-DD-YYYY')
+    if (!parsedDate.isValid()) {
+      bot.reply(message, 'Entered an invalid date')
+    } else {
+      updateStartDate(parsedDate)
+      const updatedStartDate = getUpdatedDates()[0].format('dddd, MMMM Do YYYY')
+      bot.reply(message, `Updated start date: ${updatedStartDate}`)
+    }
   }
 })
 
 controller.hears(/(update_end)\b/, ['direct_message'], (bot, message) => {
   if (updatingDates) {
-    updateEndDate(moment(message.text.split(' ')[1], 'MM-DD-YYYY'))
-    bot.reply(message, `Updated end date: ${getUpdatedDates()[1].format('dddd, MMMM Do YYYY')}`)
+    const parsedDate = moment(message.text.split(' ')[1], 'MM-DD-YYYY')
+    if (!parsedDate.isValid()) {
+      bot.reply(message, 'Entered an invalid date')
+    } else {
+      updateEndDate(parsedDate)
+      const updatedEndDate = getUpdatedDates()[1].format('dddd, MMMM Do YYYY')
+      bot.reply(message, `Updated end date: ${updatedEndDate}`)
+    }
   }
 })
 
