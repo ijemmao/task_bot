@@ -115,6 +115,7 @@ export const checkOnTerm = (terms) => {
 export const daysBeforeStart = (terms) => {
   let minDays = 10000
   let upcomingTerm = null
+  // finding the term that has the smallest difference in days
   terms.forEach(term => {
     const daysDifference = Math.abs(moment().diff(term.ranges[0], 'days'))
     if (minDays > daysDifference) {
@@ -181,9 +182,11 @@ export const getConfirmDatesMessage = (currentTerm) => {
         endDate = moment(term.endDate)
         for (const section in confirmDatesMessage) {
           if (section !== 'dates' && section !== 'commands') {
+            // if not a list, handle as regular text
             message += confirmDatesMessage[section]
           } else {
             if (section === 'dates') {
+              // populating the start/end dates with dates from database
               newStartDate = startDate
               newEndDate = endDate
               confirmDatesMessage[section] = [

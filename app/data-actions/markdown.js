@@ -19,6 +19,10 @@ export const formatDicts = (dict) => {
   return result
 }
 
+/*
+ * Format items in a list into a bullet list format where each
+ * line is not tabbed.
+ */
 export const formatLists = (list) => {
   let result = ''
 
