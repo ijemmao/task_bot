@@ -34,7 +34,7 @@ const slackbot = controller.spawn({
   // this grabs the slack token we exported earlier
 })
 
-const slackbotRTM = slackbot.startRTM((err, bot) => {
+export const slackbotRTM = slackbot.startRTM((err, bot) => {
   // start the real time message client
   if (err) throw new Error(err)
 })

@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 
 const userSchema = new Schema({
   id: String,
+  onTerm: Boolean,
   name: String,
   channels: [String],
   username: String,

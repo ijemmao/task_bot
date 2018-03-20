@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 
 const teamSchema = new Schema({
   id: String,
+  onTerm: Boolean,
   name: String,
   meetingTimes: [Date],
   projectManager: String,
