@@ -1,12 +1,27 @@
 import botkit from 'botkit'
 import schedule from 'node-schedule'
 import moment from 'moment'
+import * as db from './db'
+import { formatLists } from './data-actions/markdown'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { getMilestone, checkOnTerm } from './data-actions/milestones'
+import {
+  checkOnTerm,
+  daysBeforeStart,
+  getConfirmDatesMessage,
+  termDates,
+  updateStartDate,
+  updateEndDate,
+  getUpdatedDates,
+} from './data-actions/term-dates'
+import { updateTerm, getTerm } from './db-actions/term-actions'
+import { getMilestone } from './data-actions/milestones'
 
 let currentWeek = 0
+let currentTerm = null
 let onTerm = false
+let confirmedDates = false
+let updatingDates = getConfirmDatesMessage
 
 // botkit controller
 const controller = botkit.slackbot({
@@ -19,14 +34,15 @@ const slackbot = controller.spawn({
   // this grabs the slack token we exported earlier
 })
 
+const slackbotRTM = slackbot.startRTM((err, bot) => {
+  // start the real time message client
+  if (err) throw new Error(err)
+})
+
 console.log('Task Bot is up and running!')
 
 // prepare webhook
 controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
-  const slackbotRTM = slackbot.startRTM(err => {
-    // start the real time message client
-    if (err) throw new Error(err)
-  })
   controller.createWebhookEndpoints(webserver, slackbotRTM, () => {
     if (err) {
       throw new Error(err)
@@ -89,12 +105,105 @@ controller.on('send_milestones', (bot, week) => {
   })
 })
 
+// ----------------- send confirmation updates ---------------- //
+
+/*
+ * Starts conversation with admin user to update the start dates
+ */
+controller.on('send_term_start_confirmation', (bot) => {
+  bot.api.users.list({}, (err, res) => {
+    let adminUser = null
+    res.members.forEach(user => {
+      if (user.real_name === 'Ijemma Onwuzulike') {
+        adminUser = user
+      }
+    })
+    bot.api.im.open({ user: adminUser.id }, (err1, res1) => {
+      const directChannelId = res1.channel.id
+      updatingDates = true
+      getConfirmDatesMessage(currentTerm)
+        .then(message => {
+          bot.say({ channel: directChannelId, text: message }, () => { })
+        })
+    })
+  })
+})
+
+// --------------- confirming start dates ----------------- //
+
+controller.hears(/(update_start)\b/, ['direct_message'], (bot, message) => {
+  if (updatingDates) {
+    const parsedDate = moment(message.text.split(' ')[1], 'MM-DD-YYYY')
+    if (!parsedDate.isValid()) {
+      bot.reply(message, 'Entered an invalid date')
+    } else {
+      updateStartDate(parsedDate)
+      const updatedStartDate = getUpdatedDates()[0].format('dddd, MMMM Do YYYY')
+      bot.reply(message, `Updated start date: ${updatedStartDate}`)
+    }
+  }
+})
+
+controller.hears(/(update_end)\b/, ['direct_message'], (bot, message) => {
+  if (updatingDates) {
+    const parsedDate = moment(message.text.split(' ')[1], 'MM-DD-YYYY')
+    if (!parsedDate.isValid()) {
+      bot.reply(message, 'Entered an invalid date')
+    } else {
+      updateEndDate(parsedDate)
+      const updatedEndDate = getUpdatedDates()[1].format('dddd, MMMM Do YYYY')
+      bot.reply(message, `Updated end date: ${updatedEndDate}`)
+    }
+  }
+})
+
+controller.hears(/(show)\b/, ['direct_message'], (bot, message) => {
+  if (updatingDates) {
+    const updatedStart = getUpdatedDates()[0]
+    const updatedEnd = getUpdatedDates()[1]
+    const currentDates = [
+      `Current start date: ${updatedStart.format('dddd, MMMM Do YYYY')}`,
+      `Current end date: ${updatedEnd.format('dddd, MMMM Do YYYY')}`,
+    ]
+    bot.reply(message, formatLists(currentDates))
+  }
+})
+
+controller.hears(/(abort)\b/, ['direct_message'], (bot, message) => {
+  if (updatingDates) {
+    updatingDates = false
+    bot.reply(message, 'Alright, I will check back in with you tomorrow at 10AM')
+    const tomorrowAtTen = moment().add(1, 'days').hour(10).toDate()
+    const confirmDatesTomorrow = schedule.scheduleJob(tomorrowAtTen, () => {
+      controller.trigger('send_term_start_confirmation', [bot])
+    })
+  }
+})
+
+controller.hears(/(complete)\b/, ['direct_message'], (bot, message) => {
+  if (updatingDates) {
+    updatingDates = false
+    confirmedDates = true
+    console.log(getUpdatedDates()[0], getUpdatedDates()[1])
+    updateTerm({ name: currentTerm, startDate: getUpdatedDates()[0].toDate(), endDate: getUpdatedDates()[1].toDate() })
+    .then(res => {
+      bot.reply(message, 'Sweet! Thanks for updating the dates!\n\nUse *update_term_dates* to update the upcoming term start and end')
+    })
+  }
+})
+
+controller.hears(/(update_term_dates)\b/, ['direct_message'], (bot, message) => {
+  if (!updatingDates) {
+    controller.trigger('send_term_start_confirmation', [bot])
+  }
+})
+
 // ---------------------- add users ----------------------- //
 
 /*
  * Adds all users into the database
  */
-controller.hears('add_all_users', ['direct_message'], (bot, message) => {
+controller.hears(/(add_all_users)\b/, ['direct_message'], (bot, message) => {
   bot.api.users.list({}, (err, res) => {
     if (err) return err
     res.members.forEach(member => {
@@ -110,7 +219,7 @@ controller.hears('add_all_users', ['direct_message'], (bot, message) => {
 /*
  * Grabs all users from DALI-API
  */
-controller.hears('get_dali_users', ['direct_message'], (bot, message) => {
+controller.hears(/(get_dali_users)\b/, ['direct_message'], (bot, message) => {
   getDALIUsers()
   .then(res => { return res.json() })
   .then(json => {
@@ -121,7 +230,7 @@ controller.hears('get_dali_users', ['direct_message'], (bot, message) => {
 /*
  * Adds a specified user
  */
-controller.hears('add_user', ['direct_message'], (bot, message) => {
+controller.hears(/(add_user)\b/, ['direct_message'], (bot, message) => {
   const newUser = message.text.split(/[ <>@]/).filter(item => item.length > 0)[1]
   bot.api.users.info({ user: newUser }, (err, res) => {
     createUser(res.user)
@@ -134,39 +243,50 @@ controller.hears('add_user', ['direct_message'], (bot, message) => {
 // Slacks out channel productivity every Saturday at 10AM
 const channelActivityReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 6 }, () => {
   console.log('Reminding all channels that there are milestones to complete')
-
-  slackbot.startRTM((err, bot) => {
-    if (err) throw new Error(err)
-
-    console.log('Poking channels that need better activity')
-    if (onTerm) controller.trigger('poke_channels_activity', [bot])
-  })
+  console.log('Poking channels that need better activity')
+  if (onTerm) controller.trigger('poke_channels_activity', [slackbotRTM])
 })
 
 // Slacks out channels current milestones every Tuesday at 10AM
 const milestoneReminder = schedule.scheduleJob({ hour: 10, minute: 0, second: 0, dayOfWeek: 2 }, () => {
   console.log('Sending out milestone reminder')
-  slackbot.startRTM((err, bot) => {
-    if (err) throw new Error(err)
-
-    console.log('Sending milestones if currently on a term')
-    if (onTerm) {
-      currentWeek += 1
-      if (onTerm) controller.trigger('send_milestones', [bot, currentWeek])
-    }
-    // reset the week counter
-    if (currentWeek === 10) currentWeek = 0
-  })
+  console.log('Sending milestones if currently on a term')
+  if (onTerm) {
+    getTerm(currentTerm)
+    .then(currentTerm => {
+      currentWeek = moment().diff(currentTerm.startDate, 'weeks')
+      if (onTerm) controller.trigger('send_milestones', [slackbotRTM, currentWeek])
+    })
+  }
 })
 
 // Checks daily at 12AM to see if term start/end dates are correct
-const updateTermBounds = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
+const updateTermInfo = schedule.scheduleJob({ hour: 0, minute: 0, second: 0 }, () => {
   console.log('Updating the expected term bounds are correct')
 
   // We are not in a term and we haven't confirmed correct term start/end dates
-  /*
-   * TODO: Check with admin to make sure that currently assigned
-   * start/end dates are correct
-   */
-  onTerm = checkOnTerm()
+  const termResults = checkOnTerm()
+  currentTerm = termResults.term
+  onTerm = termResults.onTerm
+})
+
+// Checks daily at 10AM to see whether the bot should update the start dates for the term
+const updateTermStart = schedule.scheduleJob({ hour: 10, minute: 0, second: 0 }, () => {
+  console.log('Updating the term start date')
+
+  if (!confirmedDates) {
+    // Checks to see if it is less than four days before the next term
+    const pulledTerms = termDates()
+    const daysBefore = daysBeforeStart(pulledTerms).daysBefore
+    currentTerm = daysBeforeStart(pulledTerms).upcomingTerm
+    if (daysBefore < 4) {
+      updatingDates = true
+      confirmedDates = false
+      // Start the conversation to confirm start dates
+      console.log('Sending confirmation message to user')
+      controller.trigger('send_term_start_confirmation', [slackbotRTM])
+    } else {
+      console.log(`Days before the upcoming term start: ${daysBefore}`)
+    }
+  }
 })

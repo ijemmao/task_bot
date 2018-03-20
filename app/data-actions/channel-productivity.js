@@ -1,4 +1,3 @@
-import moment from 'moment'
 /*
  * Returns a productivity score for each provided channel
  * Current favors channels that have response times below
