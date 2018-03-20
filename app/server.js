@@ -5,7 +5,13 @@ import * as db from './db'
 import { formatLists } from './data-actions/markdown'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
-import { getUpdateMeetingTimesMessage } from './data-actions/meeting-times'
+import {
+  updateMeetingTime,
+  addMeetingTime,
+  removeMeetingTime,
+  getTeamMeetingTimes,
+  getUpdateMeetingTimesMessage
+} from './data-actions/meeting-times'
 import {
   checkOnTerm,
   daysBeforeStart,
@@ -166,7 +172,14 @@ controller.hears(/(update_date)\b/, ['direct_mention'], (bot, message) => {
 })
 
 controller.hears(/(add_date)\b/, ['direct_mention'], (bot, message) => {
-
+  const parsedPhrase = message.text.split(' ')
+  const parsedDate = moment(`${parsedPhrase.slice(1).join(' ')}`, 'dddd HH:mm A')
+  if (!parsedDate.isValid()) {
+    bot.reply(message, 'Entered an invalid date')
+  } else {
+    addMeetingTime(parsedDate)
+    bot.reply(message, `Added meeting time: ${parsedDate.format('dddd HH:mm A')}`)
+  }
 })
 
 controller.hears(/(remove_date)\b/, ['direct_mention'], (bot, message) => {
