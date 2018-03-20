@@ -1,11 +1,12 @@
 import { formatLists } from './markdown'
+import { getTeam } from './../db-actions/team-actions'
 
 /*
  * Confirmation message that will be sent out to
  * a channel to update meeting times
  */
 const updateMeetingTimesMessage = {
-  introMessage: '\nHey! I wanted to check in with the team to confirm your meeting times!\n',
+  introMessage: '\nHey! Just wanted to check in with the team to confirm your meeting times!\n',
   introCurrentDates: 'I currently have the following days and times:\n\n',
   dates: [],
   introCommands: '\nMake sure to *@me* to get my attention.\n\nHere is a list of commands that should be used:\n\n',
@@ -27,14 +28,19 @@ const updateMeetingTimesMessage = {
  */
 export const getUpdateMeetingTimesMessage = (channel) => {
   let message = ''
-  let meetingTimes = []
   return new Promise((resolve, reject) => {
-    getChannel({ name: channel.name })
+    getTeam(channel.name)
     .then(resChannel => {
       for (const section in updateMeetingTimesMessage) {
         if (section !== 'dates' && section !== 'commands') {
           message += updateMeetingTimesMessage[section]
         } else {
+          if (section === 'dates' && resChannel) {
+            const formatedDates = resChannel.meetingTimes.map(time => {
+              return time.format('dddd, HH:mm')
+            })
+            message += formatLists(formatedDates)
+          }
           message += formatLists(updateMeetingTimesMessage[section])
         }
       }

@@ -5,6 +5,7 @@ import * as db from './db'
 import { formatLists } from './data-actions/markdown'
 import { createUser, getDALIUsers } from './db-actions/user-actions'
 import { pokeChannels, getPokeChannels } from './data-actions/channel-productivity'
+import { getUpdateMeetingTimesMessage } from './data-actions/meeting-times'
 import {
   checkOnTerm,
   daysBeforeStart,
@@ -34,7 +35,7 @@ const slackbot = controller.spawn({
   // this grabs the slack token we exported earlier
 })
 
-export const slackbotRTM = slackbot.startRTM((err, bot) => {
+const slackbotRTM = slackbot.startRTM((err, bot) => {
   // start the real time message client
   if (err) throw new Error(err)
 })
@@ -142,9 +143,12 @@ controller.on('send_update_meeting_times', (bot) => {
     const memberChannels = res.channels.filter(item => item.is_member)
     const sendUpdateReminderPromises = memberChannels.map(channel => {
       return new Promise((resolve, reject) => {
-        bot.say({ channel: channel.id, text: 'Testing the channels right now' }, (err1, res1) => {
-          if (err1) reject(err1)
-          resolve(`Successfully sent to channel: ${channel.name}`)
+        getUpdateMeetingTimesMessage(channel.name)
+        .then(message => {
+          bot.say({ channel: channel.id, text: message }, (err1, res1) => {
+            if (err1) reject(err1)
+            resolve(`Successfully sent to channel: ${channel.name}`)
+          })
         })
       })
       .catch(e => {
