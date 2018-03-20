@@ -173,12 +173,12 @@ controller.hears(/(update_date)\b/, ['direct_mention'], (bot, message) => {
 
 controller.hears(/(add_date)\b/, ['direct_mention'], (bot, message) => {
   const parsedPhrase = message.text.split(' ')
-  const parsedDate = moment(`${parsedPhrase.slice(1).join(' ')}`, 'dddd HH:mm A')
+  const parsedDate = moment(`${parsedPhrase.slice(1).join(' ')}`, 'dddd hh:mm A')
   if (!parsedDate.isValid()) {
     bot.reply(message, 'Entered an invalid date')
   } else {
     addMeetingTime(parsedDate)
-    bot.reply(message, `Added meeting time: ${parsedDate.format('dddd HH:mm A')}`)
+    bot.reply(message, `Added meeting time: ${parsedDate.format('dddd hh:mm A')}`)
   }
 })
 
