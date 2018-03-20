@@ -1,6 +1,8 @@
 import { formatLists } from './markdown'
 import { getTeam } from './../db-actions/team-actions'
 
+let teamsMeetingTimes = {}
+
 /*
  * Confirmation message that will be sent out to
  * a channel to update meeting times
@@ -19,6 +21,43 @@ const updateMeetingTimesMessage = {
     '*not_team* - only use this command if not a team this term!',
     '*complete* - completes confirmation',
   ],
+}
+
+// TODO: check to see if valid date is inputted
+export const updateMeetingTime = (channelId, position, time) => {
+  if (!teamsMeetingTimes[channelId]) {
+    teamsMeetingTimes[channelId] = []
+  }
+  if (position < 0 || position > teamsMeetingTimes[channelId].length) {
+    return false
+  }
+  teamsMeetingTimes[channelId][position - 1] = time
+  return true
+}
+
+export const addMeetingTime = (channelId, time) => {
+  if (!teamsMeetingTimes[channelId]) {
+    teamsMeetingTimes[channelId] = []
+  }
+  teamsMeetingTimes[channelId].push(time)
+  return true
+}
+
+export const removeMeetingTime = (channelId, position) => {
+  if (!teamsMeetingTimes[channelId]) {
+    return false
+  }
+
+  if (position < 0 || position > teamsMeetingTimes[channelId].length) {
+    return false
+  }
+
+  teamsMeetingTimes[channelId].slice(0, position - 1).concat(teamsMeetingTimes[channelId].slice(position))
+  return true
+}
+
+export const getMeetingTimes = () => {
+  return teamsMeetingTimes
 }
 
 /*

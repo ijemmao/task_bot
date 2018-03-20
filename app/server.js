@@ -182,7 +182,7 @@ controller.hears(/(abort)\b/, ['direct_mention'], (bot, message) => {
 })
 
 controller.hears(/(complete)\b/, ['direct_mention'], (bot, message) => {
-  
+
 })
 
 // --------------- confirming start dates ----------------- //
