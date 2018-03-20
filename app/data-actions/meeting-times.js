@@ -11,7 +11,7 @@ const updateMeetingTimesMessage = {
   dates: [],
   introCommands: '\nMake sure to *@me* to get my attention.\n\nHere is a list of commands that should be used:\n\n',
   commands: [
-    '*update_date position dddd HH:mm* - i.e. @task_bot update_date 1 Wednesday 16:00 - Meetings are on Wednesdays at 4pm',
+    '*update_date position dddd HH:mm* - i.e. `@task_bot update_date 1 Wednesday 16:00` - Updated the first meeting time which is now Wednesdays at 4pm',
     '*add_date dddd HH:mm* - adds a new meeting date',
     '*remove_date position* - removes a meeting date',
     '*show* - shows the updated dates',

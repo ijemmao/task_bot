@@ -159,6 +159,32 @@ controller.on('send_update_meeting_times', (bot) => {
   })
 })
 
+// --------------- updating meeting times ----------------- //
+
+controller.hears(/(update_date)\b/, ['direct_mention'], (bot, message) => {
+
+})
+
+controller.hears(/(add_date)\b/, ['direct_mention'], (bot, message) => {
+
+})
+
+controller.hears(/(remove_date)\b/, ['direct_mention'], (bot, message) => {
+
+})
+
+controller.hears(/(show)\b/, ['direct_mention'], (bot, message) => {
+
+})
+
+controller.hears(/(abort)\b/, ['direct_mention'], (bot, message) => {
+
+})
+
+controller.hears(/(complete)\b/, ['direct_mention'], (bot, message) => {
+  
+})
+
 // --------------- confirming start dates ----------------- //
 
 controller.hears(/(update_start)\b/, ['direct_message'], (bot, message) => {
