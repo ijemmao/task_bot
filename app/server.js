@@ -129,6 +129,32 @@ controller.on('send_term_start_confirmation', (bot) => {
   })
 })
 
+controller.hears('ijemma', ['direct_message'], (bot, message) => {
+  controller.trigger('send_update_meeting_times', [bot])
+})
+
+/*
+ * @channel to update the meeting time for the specific team
+ */
+controller.on('send_update_meeting_times', (bot) => {
+  console.log('Sending meeting times update message')
+  bot.api.channels.list({}, (err, res) => {
+    const memberChannels = res.channels.filter(item => item.is_member)
+    const sendUpdateReminderPromises = memberChannels.map(channel => {
+      return new Promise((resolve, reject) => {
+        bot.say({ channel: channel.id, text: 'Testing the channels right now' }, (err1, res1) => {
+          if (err1) reject(err1)
+          resolve(`Successfully sent to channel: ${channel.name}`)
+        })
+      })
+      .catch(e => {
+        console.log(`There was an error sending: ${e}`)
+      })
+    })
+    Promise.all(sendUpdateReminderPromises)
+  })
+})
+
 // --------------- confirming start dates ----------------- //
 
 controller.hears(/(update_start)\b/, ['direct_message'], (bot, message) => {
